@@ -12,6 +12,10 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
+app.get('/', (req, res) => {
+  res.json({ status: 'success', message: 'AuraTrade API Server is running!' });
+});
+
 // In-memory Mock Database
 let users = [
   { id: 'user_1', name: 'Demo Client', email: 'client@auratrade.com', password: 'client123', balance: 15000.00, role: 'client' },
@@ -315,6 +319,23 @@ app.post('/api/admin/users/adjust-balance', (req, res) => {
   }
 
   user.balance = Number((user.balance + Number(amount)).toFixed(2));
+  res.json({ status: 'success', data: user });
+});
+
+// Set client balance directly (used by Admin Control Panel)
+app.post('/api/admin/balance', (req, res) => {
+  const { userId, newBalance } = req.body;
+
+  if (!userId || newBalance === undefined) {
+    return res.status(400).json({ status: 'error', message: 'Missing userId or newBalance.' });
+  }
+
+  const user = users.find(u => u.id === userId);
+  if (!user) {
+    return res.status(404).json({ status: 'error', message: 'Client profile not found.' });
+  }
+
+  user.balance = Number(newBalance);
   res.json({ status: 'success', data: user });
 });
 
