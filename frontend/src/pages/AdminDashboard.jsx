@@ -384,7 +384,83 @@ export default function AdminDashboard({ currentUser, onLogout, setActivePage })
         .form-input-icon { padding-left: 2.5rem; width: 100%; }
         @media (max-width: 768px) {
           .dash-layout { grid-template-columns: 1fr; }
-          .dash-sidebar { position: relative; height: auto; }
+          .dash-sidebar {
+            position: sticky;
+            top: 70px;
+            height: auto;
+            width: 100%;
+            border-right: none;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            z-index: 10;
+            padding: 0.75rem 1rem;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+          }
+          .dash-sidebar-profile {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+            gap: 0.5rem;
+          }
+          .admin-avatar {
+            width: 30px;
+            height: 30px;
+          }
+          .dash-user-name {
+            font-size: 0.85rem;
+          }
+          .dash-nav {
+            flex-direction: row;
+            width: 100%;
+            overflow-x: auto;
+            gap: 0.25rem;
+            order: 3;
+            padding-top: 0.5rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            margin-top: 0.25rem;
+          }
+          .dash-nav-btn {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.8rem;
+            width: auto;
+            white-space: nowrap;
+          }
+          .dash-sidebar-actions {
+            flex-direction: row;
+            border-top: none;
+            padding-top: 0;
+            gap: 0.5rem;
+            order: 2;
+          }
+          .dash-main {
+            padding: 1.25rem;
+          }
+          .grid-cols-4 {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+          }
+        }
+        @media (max-width: 480px) {
+          .grid-cols-4 {
+            grid-template-columns: 1fr;
+          }
+          .dash-sidebar {
+            flex-direction: column;
+            align-items: flex-start;
+          }
+          .dash-sidebar-actions {
+            width: 100%;
+            justify-content: space-between;
+            order: 2;
+            padding-top: 0.5rem;
+            border-top: 1px dashed rgba(255,255,255,0.1);
+          }
+          .dash-nav {
+            order: 3;
+          }
         }
       `}</style>
     </div>
