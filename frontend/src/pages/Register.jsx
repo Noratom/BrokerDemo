@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { User, Mail, Lock, TrendingUp, Shield, ArrowRight, Landmark, CheckCircle, Sparkles } from 'lucide-react';
+import { API_BASE_URL } from '../config';
 
 export default function Register({ onAuthSuccess, onSwitchToLogin }) {
   const [formData, setFormData] = useState({
@@ -27,7 +28,7 @@ export default function Register({ onAuthSuccess, onSwitchToLogin }) {
 
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/api/auth/register', {
+      const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)

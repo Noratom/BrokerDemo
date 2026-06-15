@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Search, ArrowUpRight, ArrowDownRight, Activity } from 'lucide-react';
+import { API_BASE_URL } from '../config';
 
 export default function MarketTable({ onSelectAsset }) {
   const [markets, setMarkets] = useState([
@@ -18,7 +19,7 @@ export default function MarketTable({ onSelectAsset }) {
   useEffect(() => {
     const fetchMarkets = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/markets');
+        const response = await fetch(`${API_BASE_URL}/api/markets`);
         if (response.ok) {
           const result = await response.json();
           if (result.data) {

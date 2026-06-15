@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ArrowUpRight, ArrowDownRight, Briefcase, TrendingUp, DollarSign, X, ShieldAlert, CheckCircle, UserPlus } from 'lucide-react';
+import { API_BASE_URL } from '../config';
 
 export default function TradingSimulator({ selectedAsset, setSelectedAsset, currentUser }) {
   // Demo states (local state syncs with server if logged in, otherwise localstorage)
@@ -28,7 +29,7 @@ export default function TradingSimulator({ selectedAsset, setSelectedAsset, curr
   useEffect(() => {
     const fetchHistory = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/markets/history/${selectedAsset}`);
+        const response = await fetch(`${API_BASE_URL}/api/markets/history/${selectedAsset}`);
         if (response.ok) {
           const result = await response.json();
           setChartData(result.history);
@@ -67,7 +68,7 @@ export default function TradingSimulator({ selectedAsset, setSelectedAsset, curr
   useEffect(() => {
     const interval = setInterval(async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/markets');
+        const response = await fetch(`${API_BASE_URL}/api/markets`);
         if (response.ok) {
           const result = await response.json();
           const target = result.data.find(m => m.symbol === selectedAsset);
@@ -114,7 +115,7 @@ export default function TradingSimulator({ selectedAsset, setSelectedAsset, curr
     }
 
     try {
-      const response = await fetch(`http://localhost:5000/api/trades/${currentUser.id}`);
+      const response = await fetch(`${API_BASE_URL}/api/trades/${currentUser.id}`);
       if (response.ok) {
         const result = await response.json();
         setPositions(result.data);
@@ -146,7 +147,7 @@ export default function TradingSimulator({ selectedAsset, setSelectedAsset, curr
     const userId = currentUser ? currentUser.id : 'guest';
 
     try {
-      const response = await fetch('http://localhost:5000/api/trades', {
+      const response = await fetch(`${API_BASE_URL}/api/trades`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -193,7 +194,7 @@ export default function TradingSimulator({ selectedAsset, setSelectedAsset, curr
     const isGuest = !currentUser || targetPos?.userId === 'guest' || !targetPos?.userId;
 
     try {
-      const response = await fetch(`http://localhost:5000/api/trades/close/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/trades/close/${id}`, {
         method: 'POST'
       });
 

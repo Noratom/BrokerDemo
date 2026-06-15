@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X, Lock, Mail, User, Landmark, ShieldCheck } from 'lucide-react';
+import { API_BASE_URL } from '../config';
 
 export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
   const [isRegister, setIsRegister] = useState(false);
@@ -25,8 +26,8 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
     setLoading(true);
 
     const url = isRegister 
-      ? 'http://localhost:5000/api/auth/register' 
-      : 'http://localhost:5000/api/auth/login';
+      ? `${API_BASE_URL}/api/auth/register` 
+      : `${API_BASE_URL}/api/auth/login`;
 
     try {
       const response = await fetch(url, {

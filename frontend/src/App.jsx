@@ -8,6 +8,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import UserDashboard from './pages/UserDashboard';
+import { API_BASE_URL } from './config';
 import './App.css';
 
 function App() {
@@ -24,7 +25,7 @@ function App() {
 
     const syncUserBalance = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/users/${currentUser.id}`);
+        const response = await fetch(`${API_BASE_URL}/api/users/${currentUser.id}`);
         if (response.ok) {
           const result = await response.json();
           setCurrentUser(prev => {
@@ -112,7 +113,7 @@ function App() {
                     const subject = e.target.subject.value;
                     
                     try {
-                      await fetch('http://localhost:5000/api/contact', {
+                      await fetch(`${API_BASE_URL}/api/contact`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ name, email, subject, message })

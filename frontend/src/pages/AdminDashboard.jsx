@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Users, BarChart3, Settings, MessageSquare, Shield, DollarSign, TrendingUp, Activity, Search, Edit3, Check, X, RefreshCw } from 'lucide-react';
+import { API_BASE_URL } from '../config';
 
 export default function AdminDashboard({ currentUser, onLogout, setActivePage }) {
   const [activeTab, setActiveTab] = useState('users');
@@ -23,10 +24,10 @@ export default function AdminDashboard({ currentUser, onLogout, setActivePage })
   const fetchAll = async () => {
     try {
       const [uRes, tRes, mRes, cRes] = await Promise.all([
-        fetch('http://localhost:5000/api/admin/users'),
-        fetch('http://localhost:5000/api/admin/trades'),
-        fetch('http://localhost:5000/api/markets'),
-        fetch('http://localhost:5000/api/admin/messages')
+        fetch(`${API_BASE_URL}/api/admin/users`),
+        fetch(`${API_BASE_URL}/api/admin/trades`),
+        fetch(`${API_BASE_URL}/api/markets`),
+        fetch(`${API_BASE_URL}/api/admin/messages`)
       ]);
       if (uRes.ok) { const r = await uRes.json(); setUsers(r.data); }
       if (tRes.ok) { const r = await tRes.json(); setAllTrades(r.data); }
@@ -42,7 +43,7 @@ export default function AdminDashboard({ currentUser, onLogout, setActivePage })
 
   const handleBalanceUpdate = async (userId) => {
     try {
-      const response = await fetch('http://localhost:5000/api/admin/balance', {
+      const response = await fetch(`${API_BASE_URL}/api/admin/balance`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId, newBalance: Number(editBalance) })
@@ -60,7 +61,7 @@ export default function AdminDashboard({ currentUser, onLogout, setActivePage })
   const handlePriceOverride = async () => {
     if (!overridePrice) return;
     try {
-      const response = await fetch('http://localhost:5000/api/admin/markets/override', {
+      const response = await fetch(`${API_BASE_URL}/api/admin/markets/override`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ symbol: overrideSymbol, price: Number(overridePrice) })

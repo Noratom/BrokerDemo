@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Mail, MessageSquare, Shield, HelpCircle, ChevronDown, ChevronUp, Check } from 'lucide-react';
+import { API_BASE_URL } from '../config';
 
 export default function ContactForm() {
   const [formData, setFormData] = useState({
@@ -40,7 +41,7 @@ export default function ContactForm() {
     setStatus({ type: 'loading', message: 'Sending message...' });
 
     try {
-      const response = await fetch('http://localhost:5000/api/contact', {
+      const response = await fetch(`${API_BASE_URL}/api/contact`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)

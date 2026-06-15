@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import { API_BASE_URL } from '../config';
 
 export default function LiveTicker() {
   const [rates, setRates] = useState([
@@ -15,7 +16,7 @@ export default function LiveTicker() {
   useEffect(() => {
     const fetchRates = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/markets');
+        const response = await fetch(`${API_BASE_URL}/api/markets`);
         if (response.ok) {
           const result = await response.json();
           if (result.data) {

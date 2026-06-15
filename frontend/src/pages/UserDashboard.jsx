@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { LayoutDashboard, Briefcase, Clock, Star, TrendingUp, DollarSign, ArrowUpRight, ArrowDownRight, Activity, LogOut, Settings } from 'lucide-react';
+import { API_BASE_URL } from '../config';
 
 export default function UserDashboard({ currentUser, onLogout, setActivePage }) {
   const [activeTab, setActiveTab] = useState('overview');
@@ -14,8 +15,8 @@ export default function UserDashboard({ currentUser, onLogout, setActivePage }) 
     const fetchData = async () => {
       try {
         const [posRes, mkRes] = await Promise.all([
-          fetch(`http://localhost:5000/api/trades/${currentUser.id}`),
-          fetch('http://localhost:5000/api/markets')
+          fetch(`${API_BASE_URL}/api/trades/${currentUser.id}`),
+          fetch(`${API_BASE_URL}/api/markets`)
         ]);
         if (posRes.ok) { const r = await posRes.json(); setPositions(r.data); }
         if (mkRes.ok) { const r = await mkRes.json(); setMarkets(r.data); }
