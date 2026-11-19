@@ -1,5 +1,8 @@
 import React, { useEffect } from 'react';
-import { Shield, Award, Zap, ChevronRight, Check, Sparkles, Star, TrendingUp, DollarSign } from 'lucide-react';
+import {
+  Shield, Award, Zap, ChevronRight, Check, Sparkles,
+  Lock, BarChart2, TrendingUp, Globe, CheckSquare, Phone
+} from 'lucide-react';
 import MarketTable from '../components/MarketTable';
 import TradingSimulator from '../components/TradingSimulator';
 import CompareCalculator from '../components/CompareCalculator';
@@ -24,165 +27,248 @@ export default function Home({ selectedAsset, setSelectedAsset, currentUser, onO
     return () => observer.disconnect();
   }, []);
 
-  const accountTiers = [
+  // Investment / pricing tiers (Bronze / Silver / Premium)
+  const pricingTiers = [
     {
-      name: 'Standard Account',
-      minDeposit: '$100',
-      spreads: 'From 1.2 pips',
-      leverage: 'Up to 1:100',
-      commission: 'Zero Commission',
-      popular: false,
-      features: ['24/7 Standard Support', 'Access to 100+ CFDs', 'Free Market Analysis', 'Negative Balance Protection']
+      name: 'Bronze',
+      roi: '20%',
+      duration: '24 Hours',
+      min: '$500',
+      max: '$10,000',
+      features: [
+        'Duration: 24 Hours',
+        'Minimum: $500',
+        'Maximum: $10,000',
+        'Asset Protection',
+        'Live Support',
+      ],
     },
     {
-      name: 'Professional Account',
-      minDeposit: '$2,000',
-      spreads: 'From 0.4 pips',
-      leverage: 'Up to 1:100',
-      commission: '$3 per lot',
-      popular: true,
-      features: ['Dedicated Account Manager', 'Raw ECN Spreads', 'Advanced Charting Tools', 'Priority Support Channels', 'Exclusive Webinar Invites']
+      name: 'Silver',
+      roi: '40%',
+      duration: '48 Hours',
+      min: '$10,000',
+      max: '$50,000',
+      features: [
+        'Duration: 48 Hours',
+        'Minimum: $10,000',
+        'Maximum: $50,000',
+        'Asset Protection',
+        'Live Support',
+      ],
     },
     {
-      name: 'VIP Institutional',
-      minDeposit: '$25,000',
-      spreads: 'From 0.0 pips',
-      leverage: 'Up to 1:200',
-      commission: 'Custom rates',
-      popular: false,
-      features: ['1-on-1 Trading Mentorship', 'Custom API Liquidity', 'Free VPS Hosting', 'No-cost Deposits & Withdrawals', 'VIP Lounge Events']
-    }
+      name: 'Premium',
+      roi: '60%',
+      duration: '72 Hours',
+      min: '$50,000',
+      max: 'Unlimited',
+      features: [
+        'Duration: 72 Hours',
+        'Minimum: $50,000',
+        'Maximum: Unlimited',
+        'Asset Protection',
+        'Live Support',
+      ],
+    },
+  ];
+
+  // Why Choose Us items
+  const whyItems = [
+    {
+      icon: <Lock size={28} style={{ color: '#1a3edb' }} />,
+      title: 'Security & Privacy',
+      desc: 'Your assets and personal data are protected with enterprise-grade encryption and multi-layer security protocols.',
+    },
+    {
+      icon: <BarChart2 size={28} style={{ color: '#1a3edb' }} />,
+      title: 'Investing Tools',
+      desc: 'Access powerful analytics and real-time market data to make smarter investment decisions every day.',
+    },
+    {
+      icon: <Shield size={28} style={{ color: '#1a3edb' }} />,
+      title: 'Asset Protection',
+      desc: 'All client funds are fully segregated and insured, ensuring your investment is never at systemic risk.',
+    },
+    {
+      icon: <Globe size={28} style={{ color: '#1a3edb' }} />,
+      title: 'Investment Access',
+      desc: 'Gain access to global markets and diversified portfolios previously available only to institutional investors.',
+    },
   ];
 
   return (
     <div className="home-page">
-      {/* Hero Section — Full Background Image */}
+
+      {/* ═══════════════════════════════
+          1. HERO SECTION
+      ═══════════════════════════════ */}
       <header className="hero">
-        <div className="container grid grid-cols-2 gap-8 items-center flex-col-mobile hero-container">
+        <div className="container hero-container">
           <div className="hero-content flex flex-col gap-4 animate-slide-left visible">
-            <div className="badge badge-gold flex items-center gap-2">
-              <Shield size={16} className="text-gold" />
-              <span className="gold-shimmer-text">Regulated STP/ECN Liquidity Broker</span>
-            </div>
-            <h1 className="text-white">Empower Your Financial Horizon</h1>
+            <h1 className="hero-headline">
+              Empower Your<br />Financial Horizon
+            </h1>
             <p className="hero-desc">
-              Trade Forex, Cryptocurrencies, and Commodities with ultra-competitive raw spreads, lightning-fast order matching, and a state-of-the-art virtual dashboard.
+              Join thousands of members earning consistent passive income through our transparent,
+              high-yield investment plans. Start your journey today.
             </p>
-            <div className="flex gap-4 flex-col-mobile" style={{ marginTop: '1.5rem' }}>
+            <div className="flex gap-4 flex-col-mobile hero-cta-row">
               {currentUser ? (
-                <button 
+                <button
                   className="btn btn-gold btn-lg flex items-center justify-center gap-2"
                   onClick={() => {
-                    document.getElementById('trading-desk')?.scrollIntoView({ behavior: 'smooth' });
+                    document.getElementById('investment')?.scrollIntoView({ behavior: 'smooth' });
                   }}
                 >
-                  <span>Go to Trading Desk</span>
+                  <span>View Investment Plans</span>
                   <ChevronRight size={18} />
                 </button>
               ) : (
-                <button 
+                <button
                   className="btn btn-gold btn-lg flex items-center justify-center gap-2"
                   onClick={onOpenAuth}
                 >
-                  <span>Create Demo Profile</span>
+                  <span>Become a Member</span>
                   <ChevronRight size={18} />
                 </button>
               )}
-              <button 
-                className="btn btn-secondary btn-lg btn-white-border flex items-center justify-center"
+              <button
+                className="btn btn-outline-white btn-lg flex items-center justify-center"
                 onClick={() => {
-                  document.getElementById('account-tiers')?.scrollIntoView({ behavior: 'smooth' });
+                  document.getElementById('investment')?.scrollIntoView({ behavior: 'smooth' });
                 }}
               >
-                Compare Account Tiers
+                Get Started
               </button>
-            </div>
-          </div>
-          
-          {/* Glassmorphic Stats Grid */}
-          <div className="hero-stats-panel grid grid-cols-2 gap-4 animate-slide-right visible">
-            <div className="glass-card stat-box">
-              <div className="stat-value font-mono"><span className="gold-shimmer-text">15ms</span></div>
-              <div className="stat-label">Avg Execution Speed</div>
-            </div>
-            <div className="glass-card stat-box">
-              <div className="stat-value font-mono">$4.2B+</div>
-              <div className="stat-label">Daily Volume Traded</div>
-            </div>
-            <div className="glass-card stat-box">
-              <div className="stat-value font-mono">0.0 pips</div>
-              <div className="stat-label">ECN Spreads from</div>
-            </div>
-            <div className="glass-card stat-box">
-              <div className="stat-value font-mono">120K+</div>
-              <div className="stat-label">Active Global Traders</div>
             </div>
           </div>
         </div>
       </header>
 
-      {/* Feature Value Props */}
-      <section className="features-banner section-bg-white section animate-on-scroll">
+      {/* ═══════════════════════════════
+          2. 3-STEP STRIP
+      ═══════════════════════════════ */}
+      <section className="steps-strip animate-on-scroll">
         <div className="container">
-          <div className="grid grid-cols-3 gap-8">
-            <div className="feature-item flex flex-col gap-2">
-              <Award size={36} className="text-gold" />
-              <h3>Globally Awarded Spreads</h3>
-              <p className="text-sm text-muted">
-                Leverage institutional relationships for raw spreads starting from 0.0 pips. Enjoy zero-markup routing.
-              </p>
-            </div>
-            <div className="feature-item flex flex-col gap-2">
-              <Zap size={36} className="text-gold" />
-              <h3>High-Speed Matching</h3>
-              <p className="text-sm text-muted">
-                Orders are executed on our premium NY4 servers, ensuring sub-15ms processing speeds and minimal slippage.
-              </p>
-            </div>
-            <div className="feature-item flex flex-col gap-2">
-              <Shield size={36} className="text-gold" />
-              <h3>Fortified Safety Policies</h3>
-              <p className="text-sm text-muted">
-                Fully segregated client funds with negative balance mitigation ensure risk exposure is rigidly governed.
-              </p>
-            </div>
+          <div className="steps-grid">
+            {[
+              {
+                label: 'Membership Registration',
+                desc: 'Create your free account in minutes and join our growing community of smart investors.',
+              },
+              {
+                label: 'Choose Plan',
+                desc: 'Select the investment plan that best suits your financial goals and risk appetite.',
+              },
+              {
+                label: 'Passive Income',
+                desc: 'Sit back and watch your earnings grow. Withdrawals are fast, secure, and hassle-free.',
+              },
+            ].map((step, i) => (
+              <div key={i} className="step-item flex flex-col gap-3">
+                <div className="step-icon-wrap">
+                  <CheckSquare size={28} style={{ color: '#1a3edb' }} />
+                </div>
+                <h3 className="step-title">{step.label}</h3>
+                <p className="step-desc">{step.desc}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Compare Calculator section */}
-      <section className="section animate-on-scroll">
-        <div className="container">
-          <div className="text-center" style={{ marginBottom: '2.5rem' }}>
-            <h2>Cost Efficiency Spotlight</h2>
-            <p className="text-muted" style={{ marginTop: '0.5rem' }}>
-              Unlike retail brokers, AuraTrade cuts margin rate markups. Adjust the slider to audit borrowing costs.
+      {/* ═══════════════════════════════
+          3. OUR PURPOSE SECTION
+      ═══════════════════════════════ */}
+      <section className="purpose-section section animate-on-scroll">
+        <div className="container purpose-inner">
+          {/* Left text */}
+          <div className="purpose-text animate-slide-left">
+            <span className="section-label">OUR PURPOSE</span>
+            <h2 className="purpose-heading">
+              Our common Purpose is Creating opportunities to rise.
+            </h2>
+            <div className="purpose-underline"></div>
+            <p className="purpose-body">
+              At AuraTrade, we believe every individual deserves access to world-class financial
+              tools and opportunities. Our mission is to democratize investing and empower our
+              members to achieve financial independence through smart, transparent, and secure
+              investment vehicles.
             </p>
           </div>
-          <CompareCalculator />
+
+          {/* Right card grid */}
+          <div className="purpose-cards grid grid-cols-2 gap-4 animate-slide-right">
+            <div className="purpose-card">
+              <div
+                className="purpose-card-img"
+                style={{ background: 'linear-gradient(135deg, #1a3edb 0%, #0d1b2a 100%)' }}
+              ></div>
+              <div className="purpose-card-body">
+                <TrendingUp size={20} style={{ color: '#1a3edb' }} />
+                <span>Explore With Us</span>
+              </div>
+            </div>
+            <div className="purpose-card">
+              <div
+                className="purpose-card-img"
+                style={{ background: 'linear-gradient(135deg, #2340e0 0%, #1a3edb 60%, #0d1b2a 100%)' }}
+              ></div>
+              <div className="purpose-card-body">
+                <BarChart2 size={20} style={{ color: '#1a3edb' }} />
+                <span>Investment Management</span>
+              </div>
+            </div>
+            <div className="purpose-card">
+              <div
+                className="purpose-card-img"
+                style={{ background: 'linear-gradient(135deg, #0d1b2a 0%, #1a3edb 100%)' }}
+              ></div>
+              <div className="purpose-card-body">
+                <Shield size={20} style={{ color: '#1a3edb' }} />
+                <span>Asset Protection</span>
+              </div>
+            </div>
+            <div className="purpose-card">
+              <div
+                className="purpose-card-img"
+                style={{ background: 'linear-gradient(135deg, #1a3edb 0%, #4f70f5 100%)' }}
+              ></div>
+              <div className="purpose-card-body">
+                <Globe size={20} style={{ color: '#1a3edb' }} />
+                <span>Global Markets</span>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* Interactive Trading Simulator */}
-      <section id="trading-desk" className="section section-bg-white animate-on-scroll">
+      {/* ═══════════════════════════════
+          TRADING DESK (existing feature)
+      ═══════════════════════════════ */}
+      <section id="trading-desk" className="section section-bg-blue animate-on-scroll">
         <div className="container flex flex-col gap-8">
           <div className="text-center" style={{ marginBottom: '1.5rem' }}>
+            <span className="section-label">LIVE TRADING</span>
             <h2>Simulated Trading Desk</h2>
             <p className="text-muted" style={{ marginTop: '0.5rem' }}>
               Practice positioning orders using virtual funds. Test live pricing spreads before going live.
             </p>
             {!currentUser && (
               <div className="login-warning-box flex items-center gap-3 justify-center" style={{ marginTop: '1rem' }}>
-                <Sparkles size={16} className="text-gold" />
+                <Sparkles size={16} style={{ color: '#1a3edb' }} />
                 <span className="text-xs">
-                  Currently trading as guest. <button onClick={onOpenAuth} className="underline-btn">Sign up now</button> to persist balances and view your personal audit records.
+                  Currently trading as guest.{' '}
+                  <button onClick={onOpenAuth} className="underline-btn">Sign up now</button>{' '}
+                  to persist balances and view your personal audit records.
                 </span>
               </div>
             )}
           </div>
-          <TradingSimulator 
-            selectedAsset={selectedAsset} 
-            setSelectedAsset={setSelectedAsset} 
+          <TradingSimulator
+            selectedAsset={selectedAsset}
+            setSelectedAsset={setSelectedAsset}
             currentUser={currentUser}
           />
         </div>
@@ -192,6 +278,7 @@ export default function Home({ selectedAsset, setSelectedAsset, currentUser, onO
       <section id="market-rates" className="section animate-on-scroll">
         <div className="container">
           <div className="text-center" style={{ marginBottom: '2.5rem' }}>
+            <span className="section-label">MARKETS</span>
             <h2>Real-Time Market Rates</h2>
             <p className="text-muted">Select an asset from the table below to load it into the Live Trading Desk.</p>
           </div>
@@ -204,235 +291,624 @@ export default function Home({ selectedAsset, setSelectedAsset, currentUser, onO
         </div>
       </section>
 
-      {/* Financial Insights Feed */}
-      <section className="section section-bg-white animate-on-scroll">
-        <div className="container">
-          <div className="flex justify-between items-center" style={{ marginBottom: '2.5rem' }}>
-            <div>
-              <h2>Market Insights & Analysis</h2>
-              <p className="text-muted">Real-time intelligence from our global trading desk.</p>
-            </div>
-            <button className="btn btn-secondary btn-sm" onClick={() => alert('Newsletter registration successful!')}>
-              Subscribe to Insights
-            </button>
-          </div>
-          
-          <div className="grid grid-cols-3 gap-8">
-            <div className="card card-static flex flex-col justify-between" style={{ padding: '1.5rem' }}>
-              <div>
-                <span className="badge badge-blue" style={{ marginBottom: '1rem' }}>Forex</span>
-                <h4 style={{ marginBottom: '0.75rem' }}>Euro Inches Higher as ECB Signals Slower Rate Reductions</h4>
-                <p className="text-xs text-muted" style={{ marginBottom: '1rem' }}>
-                  The EUR/USD pair found fresh buyers near 1.0820 today as ECB policy makers suggested that interest rate normalization might proceed at a more measured pace than previously anticipated.
-                </p>
-              </div>
-              <div className="flex justify-between items-center text-xs text-muted" style={{ borderTop: '1px solid var(--color-border-light)', paddingTop: '0.75rem' }}>
-                <span>By Aura Analysis Desk</span>
-                <span>2 hours ago</span>
-              </div>
-            </div>
-            <div className="card card-static flex flex-col justify-between" style={{ padding: '1.5rem' }}>
-              <div>
-                <span className="badge badge-gold" style={{ marginBottom: '1rem' }}>Commodities</span>
-                <h4 style={{ marginBottom: '0.75rem' }}>Gold Holds Gains Above $2,300 Amid Safe-Haven Flows</h4>
-                <p className="text-xs text-muted" style={{ marginBottom: '1rem' }}>
-                  Spot gold prices remained resilient during mid-day European trading, finding solid technical support. Analysts point to macro headwinds and ongoing geopolitical hedges.
-                </p>
-              </div>
-              <div className="flex justify-between items-center text-xs text-muted" style={{ borderTop: '1px solid var(--color-border-light)', paddingTop: '0.75rem' }}>
-                <span>By Commodity Analysts</span>
-                <span>4 hours ago</span>
-              </div>
-            </div>
-            <div className="card card-static flex flex-col justify-between" style={{ padding: '1.5rem' }}>
-              <div>
-                <span className="badge badge-blue" style={{ marginBottom: '1rem' }}>Crypto</span>
-                <h4 style={{ marginBottom: '0.75rem' }}>Bitcoin Consolidation Nears Breakout Zone</h4>
-                <p className="text-xs text-muted" style={{ marginBottom: '1rem' }}>
-                  BTC continues to consolidate between $67,500 and $69,200. On-chain volume reports indicate long-term accumulation from institutional custody accounts is accelerating.
-                </p>
-              </div>
-              <div className="flex justify-between items-center text-xs text-muted" style={{ borderTop: '1px solid var(--color-border-light)', paddingTop: '0.75rem' }}>
-                <span>By Crypto Research</span>
-                <span>6 hours ago</span>
-              </div>
-            </div>
+      {/* ═══════════════════════════════
+          4. INVESTMENT PLANS BANNER
+      ═══════════════════════════════ */}
+      <section id="investment" className="invest-banner animate-on-scroll">
+        <div className="invest-banner-overlay">
+          <div className="invest-banner-box">
+            <h2 className="invest-banner-title">Investment Plans</h2>
+            <p className="invest-banner-sub">
+              Choose the plan that matches your capital and financial goals.<br />
+              All plans include asset protection and live member support.
+            </p>
           </div>
         </div>
       </section>
 
-      {/* Account Tier grids */}
-      <section id="account-tiers" className="section animate-on-scroll">
+      {/* ═══════════════════════════════
+          5. PRICING CARDS (Bronze / Silver / Premium)
+      ═══════════════════════════════ */}
+      <section id="account-tiers" className="section animate-on-scroll" style={{ background: '#f4f6fb' }}>
         <div className="container flex flex-col gap-8">
-          <div className="text-center" style={{ marginBottom: '2rem' }}>
-            <h2>Tailored Trading Accounts</h2>
+          <div className="text-center" style={{ marginBottom: '1rem' }}>
+            <span className="section-label">INVESTMENT PLANS</span>
+            <h2>Tailored Investment Accounts</h2>
             <p className="text-muted" style={{ marginTop: '0.5rem' }}>
-              Choose a tier that fits your trading capital and transaction volume goals.
+              Select a plan that fits your investment capital and return objectives.
             </p>
           </div>
 
-          <div className="grid grid-cols-3 gap-8 flex-col-mobile">
-            {accountTiers.map((tier, index) => (
-              <div 
-                key={index} 
-                className={`card account-card flex flex-col justify-between ${
-                  tier.popular ? 'card-blue-accent border-highlight-gold shadow-premium' : ''
-                }`}
-              >
-                <div>
-                  {tier.popular && <span className="popular-badge">MOST POPULAR</span>}
-                  <h3 style={{ fontSize: '1.4rem', marginBottom: '0.5rem' }}>{tier.name}</h3>
-                  <div className="tier-deposit flex items-baseline gap-2">
-                    <span className="deposit-val">{tier.minDeposit}</span>
-                    <span className="text-xs text-muted">min deposit</span>
-                  </div>
-                  
-                  <div className="tier-stats-list flex flex-col" style={{ margin: '1.5rem 0' }}>
-                    <div className="flex justify-between text-sm py-2">
-                      <span className="text-muted">Target Spreads:</span>
-                      <strong style={{ color: 'var(--color-blue-deep)' }}>{tier.spreads}</strong>
-                    </div>
-                    <div className="flex justify-between text-sm py-2">
-                      <span className="text-muted">Leverage Options:</span>
-                      <strong style={{ color: 'var(--color-blue-deep)' }}>{tier.leverage}</strong>
-                    </div>
-                    <div className="flex justify-between text-sm py-2">
-                      <span className="text-muted">Execution Model:</span>
-                      <strong style={{ color: 'var(--color-blue-deep)' }}>STP / ECN</strong>
-                    </div>
-                    <div className="flex justify-between text-sm py-2">
-                      <span className="text-muted">Commission:</span>
-                      <strong style={{ color: 'var(--color-blue-deep)' }}>{tier.commission}</strong>
-                    </div>
-                  </div>
-
-                  <ul className="tier-features-list flex flex-col gap-2">
-                    {tier.features.map((feat, fidx) => (
-                      <li key={fidx} className="flex items-center gap-2 text-sm text-muted">
-                        <Check size={14} className="text-gold" style={{ flexShrink: 0 }} />
-                        <span>{feat}</span>
-                      </li>
-                    ))}
-                  </ul>
+          <div className="pricing-grid">
+            {pricingTiers.map((tier, index) => (
+              <div key={index} className="pricing-card">
+                {/* Card Header */}
+                <div className="pricing-card-header">
+                  <span className="pricing-card-service">Investment Service</span>
+                  <h3 className="pricing-card-name">{tier.name}</h3>
                 </div>
 
-                <button 
-                  className={`btn w-full ${tier.popular ? 'btn-gold' : 'btn-secondary'}`}
-                  style={{ width: '100%', marginTop: '2.5rem' }}
-                  onClick={() => alert(`Redirecting to open a live ${tier.name}. Secure KYC verification required.`)}
+                {/* ROI Number */}
+                <div className="pricing-roi">{tier.roi}</div>
+                <p className="pricing-roi-label">Return on Investment</p>
+
+                {/* Divider */}
+                <div className="pricing-divider"></div>
+
+                {/* Features */}
+                <ul className="pricing-features">
+                  {tier.features.map((feat, fi) => (
+                    <li key={fi} className="pricing-feature-item flex items-center gap-2">
+                      <Check size={15} style={{ color: '#1a3edb', flexShrink: 0 }} />
+                      <span>{feat}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                {/* CTA */}
+                <button
+                  className="btn btn-gold w-full pricing-cta"
+                  onClick={currentUser ? () => alert(`Opening ${tier.name} plan. Our team will contact you.`) : onOpenAuth}
                 >
-                  Create Account
+                  Get Started
                 </button>
+                <p className="pricing-note">*Contact Us for Consultations</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
+      {/* ═══════════════════════════════
+          6. WHY CHOOSE US
+      ═══════════════════════════════ */}
+      <section className="section why-section animate-on-scroll">
+        <div className="container">
+          <div className="text-center why-header">
+            <span className="section-label">WHY CHOOSE US</span>
+            <h2>Smart Investing with Smart Ideas</h2>
+            <p className="text-muted" style={{ marginTop: '0.75rem', maxWidth: '560px', margin: '0.75rem auto 0' }}>
+              We combine cutting-edge technology with deep market expertise to deliver
+              consistent, secure returns for our members worldwide.
+            </p>
+          </div>
+          <div className="why-grid">
+            {whyItems.map((item, i) => (
+              <div key={i} className="why-card flex flex-col gap-3">
+                <div className="why-icon-wrap">
+                  {item.icon}
+                </div>
+                <h4 className="why-title">{item.title}</h4>
+                <p className="why-desc">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════
+          7. START A GOOD PLAN (Overview)
+      ═══════════════════════════════ */}
+      <section className="section overview-section animate-on-scroll">
+        <div className="container">
+          <div className="overview-card">
+            <span className="section-label">OVERVIEW</span>
+            <h2 className="overview-heading">Start a Good Plan</h2>
+            <div className="overview-body">
+              <p>
+                Getting started with AuraTrade is simple and transparent. Once you complete your
+                membership registration and select your preferred investment plan, your funds are
+                allocated to our managed portfolio — secured by our multi-layer asset protection system.
+              </p>
+              <p>
+                Every member receives a dedicated support representative, real-time portfolio updates,
+                and guaranteed returns credited directly to their account upon plan maturity. We
+                believe that growing your wealth should be straightforward, secure, and stress-free.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════
+          Compare Calculator (existing)
+      ═══════════════════════════════ */}
+      <section className="section section-bg-blue animate-on-scroll">
+        <div className="container">
+          <div className="text-center" style={{ marginBottom: '2.5rem' }}>
+            <span className="section-label">ANALYTICS</span>
+            <h2>Cost Efficiency Spotlight</h2>
+            <p className="text-muted" style={{ marginTop: '0.5rem' }}>
+              Compare borrowing costs across plans. Adjust the slider to audit your potential returns.
+            </p>
+          </div>
+          <CompareCalculator />
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════
+          8. CTA STRIP — "Let Us Work For You"
+      ═══════════════════════════════ */}
+      <section className="cta-strip animate-on-scroll">
+        <div className="container cta-strip-inner">
+          <div className="cta-strip-text">
+            <h2 className="cta-strip-heading">Let Us Work For You.</h2>
+            <p className="cta-strip-sub">
+              Join thousands of members already building wealth with AuraTrade's investment platform.
+            </p>
+          </div>
+          <button
+            className="btn btn-gold btn-lg cta-strip-btn"
+            onClick={currentUser ? () => document.getElementById('investment')?.scrollIntoView({ behavior: 'smooth' }) : onOpenAuth}
+          >
+            Become a Member
+          </button>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════
+          9. NEED HELP? SPLIT SECTION
+      ═══════════════════════════════ */}
+      <section className="help-split animate-on-scroll">
+        {/* Left half — blue bg */}
+        <div className="help-left">
+          <div className="help-left-inner">
+            <h2 className="help-heading">Need Help?</h2>
+            <p className="help-sub">Don't hesitate to contact us.</p>
+            <p className="help-body">
+              Our support team is available around the clock to assist you with any questions
+              about your investments, account setup, or plan upgrades.
+            </p>
+            <button
+              className="btn btn-outline-white"
+              style={{ marginTop: '2rem' }}
+              onClick={() => alert('Contact form coming soon. Email us at support@auratrade.com')}
+            >
+              <Phone size={16} />
+              Contact Us
+            </button>
+          </div>
+        </div>
+        {/* Right half — gradient photo placeholder */}
+        <div
+          className="help-right"
+          style={{ background: 'linear-gradient(135deg, #1a3edb 0%, #0d1b2a 100%)' }}
+        >
+          <div className="help-right-overlay">
+            <Globe size={80} style={{ color: 'rgba(255,255,255,0.15)' }} />
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════
+          HOME PAGE STYLES
+      ═══════════════════════════════ */}
       <style>{`
         .home-page {
           width: 100%;
         }
+
+        /* ---- Section Label ---- */
+        .section-label {
+          display: inline-block;
+          font-size: 0.75rem;
+          font-weight: 700;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          color: #1a3edb;
+          margin-bottom: 0.75rem;
+        }
+
+        /* ---- HERO ---- */
         .hero {
           position: relative;
-          background-image: linear-gradient(var(--color-bg-hero-overlay), var(--color-bg-hero-overlay)), url('/trading_hero.png');
+          background-image: linear-gradient(rgba(13,27,42,0.78), rgba(13,27,42,0.78)), url('/trading_hero.png');
           background-size: cover;
           background-position: center;
           background-repeat: no-repeat;
           background-attachment: fixed;
-          min-height: 85vh;
+          min-height: 88vh;
           display: flex;
           align-items: center;
-          color: var(--color-white);
-          border-bottom: 1px solid var(--color-blue-deep);
+          color: #ffffff;
           padding: 5rem 0;
         }
         .hero-container {
           position: relative;
           z-index: 2;
         }
+        .hero-content {
+          max-width: 640px;
+        }
+        .hero-headline {
+          font-size: clamp(2.4rem, 5.5vw, 3.8rem);
+          font-weight: 800;
+          color: #ffffff;
+          line-height: 1.1;
+          letter-spacing: -0.03em;
+        }
         .hero-desc {
+          font-size: 1.1rem;
+          line-height: 1.65;
+          color: rgba(255,255,255,0.8);
+          max-width: 540px;
+        }
+        .hero-cta-row {
+          margin-top: 1rem;
+        }
+
+        /* ---- 3-STEP STRIP ---- */
+        .steps-strip {
+          background: #ffffff;
+          border-top: 1px solid #e5e7eb;
+          border-bottom: 1px solid #e5e7eb;
+          padding: 4rem 0;
+        }
+        .steps-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 3rem;
+        }
+        .step-item {
+          padding: 1.5rem 1rem;
+        }
+        .step-icon-wrap {
+          width: 52px;
+          height: 52px;
+          border: 2px solid #1a3edb;
+          border-radius: 10px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-bottom: 0.5rem;
+        }
+        .step-title {
           font-size: 1.15rem;
+          font-weight: 700;
+          color: #111827;
+        }
+        .step-desc {
+          font-size: 0.9rem;
+          color: #6b7280;
           line-height: 1.6;
-          max-width: 550px;
-          color: rgba(255, 255, 255, 0.85);
         }
-        .gold-shimmer-text {
-          background: var(--color-gold-shimmer);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          display: inline-block;
+
+        /* ---- OUR PURPOSE ---- */
+        .purpose-section {
+          background: #ffffff;
+        }
+        .purpose-inner {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 4rem;
+          align-items: center;
+        }
+        .purpose-text {
+          display: flex;
+          flex-direction: column;
+          gap: 1.25rem;
+        }
+        .purpose-heading {
+          font-size: clamp(1.6rem, 2.8vw, 2.2rem);
           font-weight: 800;
+          color: #111827;
+          line-height: 1.25;
         }
-        .btn-white-border {
-          background: transparent;
-          border: 2px solid rgba(255, 255, 255, 0.4);
-          color: var(--color-white);
+        .purpose-underline {
+          width: 56px;
+          height: 4px;
+          background: #1a3edb;
+          border-radius: 2px;
         }
-        .btn-white-border:hover {
-          background: rgba(255, 255, 255, 0.1);
-          border-color: var(--color-white);
+        .purpose-body {
+          font-size: 0.95rem;
+          color: #4b5563;
+          line-height: 1.7;
         }
-        .glass-card {
-          background: rgba(255, 255, 255, 0.05);
-          backdrop-filter: blur(16px);
-          -webkit-backdrop-filter: blur(16px);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          border-radius: var(--radius-lg);
-          padding: 1.75rem;
-          color: var(--color-white);
-          transition: var(--transition-smooth);
+        .purpose-cards {
         }
-        .glass-card:hover {
-          background: rgba(255, 255, 255, 0.09);
-          transform: translateY(-5px);
-          border-color: rgba(255, 255, 255, 0.25);
-          box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.25), 0 8px 20px -6px rgba(201, 152, 26, 0.15);
+        .purpose-card {
+          background: #ffffff;
+          border: 1px solid #e5e7eb;
+          border-radius: 14px;
+          overflow: hidden;
+          box-shadow: 0 2px 10px rgba(13,27,42,0.06);
+          transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
-        .stat-value {
-          font-size: 2rem;
-          font-weight: 800;
-          margin-bottom: 0.35rem;
+        .purpose-card:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 10px 28px rgba(26,62,219,0.12);
         }
-        .stat-label {
-          font-size: 0.75rem;
-          color: rgba(255, 255, 255, 0.55);
-          text-transform: uppercase;
-          letter-spacing: 0.08em;
+        .purpose-card-img {
+          height: 100px;
+          width: 100%;
+        }
+        .purpose-card-body {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          padding: 0.9rem 1rem;
+          font-size: 0.9rem;
           font-weight: 600;
+          color: #111827;
         }
-        .popular-badge {
-          background-color: var(--color-blue-deep);
-          color: var(--color-gold-bright);
-          font-size: 0.7rem;
+
+        /* ---- INVESTMENT BANNER ---- */
+        .invest-banner {
+          position: relative;
+          background-image: linear-gradient(rgba(13,27,42,0.72), rgba(13,27,42,0.72)), url('/trading_hero.png');
+          background-size: cover;
+          background-position: center;
+          background-attachment: fixed;
+          min-height: 320px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .invest-banner-overlay {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 100%;
+          padding: 3rem 1.5rem;
+        }
+        .invest-banner-box {
+          background: rgba(26, 62, 219, 0.82);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          border: 1px solid rgba(255,255,255,0.2);
+          border-radius: 18px;
+          padding: 2.5rem 3.5rem;
+          text-align: center;
+          max-width: 580px;
+        }
+        .invest-banner-title {
+          font-size: clamp(1.8rem, 4vw, 2.8rem);
           font-weight: 800;
-          padding: 0.25rem 0.5rem;
-          border-radius: var(--radius-sm);
-          letter-spacing: 0.05em;
-          display: inline-block;
+          color: #ffffff;
           margin-bottom: 0.75rem;
         }
-        .border-highlight-gold {
-          border-color: var(--color-gold-border) !important;
+        .invest-banner-sub {
+          color: rgba(255,255,255,0.85);
+          font-size: 1rem;
+          line-height: 1.6;
         }
-        .deposit-val {
-          font-size: 2.25rem;
+
+        /* ---- PRICING CARDS ---- */
+        .pricing-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 2rem;
+        }
+        .pricing-card {
+          background: #ffffff;
+          border-radius: 18px;
+          overflow: hidden;
+          box-shadow: 0 4px 20px rgba(13,27,42,0.08);
+          display: flex;
+          flex-direction: column;
+          transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .pricing-card:hover {
+          transform: translateY(-6px);
+          box-shadow: 0 16px 40px rgba(26,62,219,0.15);
+        }
+        .pricing-card-header {
+          background: #0d1b2a;
+          padding: 1.5rem 2rem 1.25rem;
+        }
+        .pricing-card-service {
+          font-size: 0.72rem;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.1em;
+          color: rgba(255,255,255,0.5);
+          display: block;
+          margin-bottom: 0.4rem;
+        }
+        .pricing-card-name {
+          font-size: 1.5rem;
           font-weight: 800;
-          color: var(--color-blue-deep);
+          color: #ffffff;
+          margin: 0;
         }
-        .tier-features-list {
+        .pricing-roi {
+          font-size: 3.5rem;
+          font-weight: 900;
+          color: #1a3edb;
+          text-align: center;
+          padding: 1.25rem 2rem 0;
+          font-family: var(--font-heading);
+          line-height: 1;
+        }
+        .pricing-roi-label {
+          text-align: center;
+          font-size: 0.78rem;
+          color: #6b7280;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.08em;
+          padding: 0.4rem 2rem 0;
+        }
+        .pricing-divider {
+          height: 1px;
+          background: #e5e7eb;
+          margin: 1.5rem 2rem;
+        }
+        .pricing-features {
           list-style: none;
-          margin-top: 1.5rem;
+          padding: 0 2rem;
+          display: flex;
+          flex-direction: column;
+          gap: 0.75rem;
+          flex: 1;
         }
-        .py-2 {
-          padding-top: 0.5rem;
-          padding-bottom: 0.5rem;
-          border-bottom: 1px solid var(--color-border-light);
+        .pricing-feature-item {
+          font-size: 0.875rem;
+          color: #4b5563;
         }
+        .pricing-cta {
+          margin: 1.75rem 2rem 0.75rem;
+          border-radius: 10px;
+        }
+        .pricing-note {
+          text-align: center;
+          font-size: 0.75rem;
+          color: #9ca3af;
+          padding: 0 2rem 1.5rem;
+        }
+
+        /* ---- WHY CHOOSE US ---- */
+        .why-section {
+          background: #eef2ff;
+        }
+        .why-header {
+          margin-bottom: 3rem;
+        }
+        .why-grid {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 2rem;
+        }
+        .why-card {
+          background: #ffffff;
+          border-radius: 16px;
+          padding: 2rem 1.5rem;
+          box-shadow: 0 2px 12px rgba(13,27,42,0.06);
+          transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .why-card:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 10px 28px rgba(26,62,219,0.1);
+        }
+        .why-icon-wrap {
+          width: 54px;
+          height: 54px;
+          border-radius: 50%;
+          background: #eef2ff;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .why-title {
+          font-size: 1rem;
+          font-weight: 700;
+          color: #1a3edb;
+          margin: 0;
+        }
+        .why-desc {
+          font-size: 0.875rem;
+          color: #6b7280;
+          line-height: 1.6;
+        }
+
+        /* ---- OVERVIEW CARD ---- */
+        .overview-section {
+          background: #ffffff;
+        }
+        .overview-card {
+          background: #f4f6fb;
+          border-radius: 20px;
+          padding: 3rem 3.5rem;
+          max-width: 820px;
+          margin: 0 auto;
+        }
+        .overview-heading {
+          font-size: clamp(1.6rem, 3vw, 2.2rem);
+          font-weight: 800;
+          color: #111827;
+          margin-bottom: 1.5rem;
+        }
+        .overview-body {
+          display: flex;
+          flex-direction: column;
+          gap: 1.1rem;
+        }
+        .overview-body p {
+          font-size: 0.95rem;
+          color: #4b5563;
+          line-height: 1.7;
+        }
+
+        /* ---- CTA STRIP ---- */
+        .cta-strip {
+          background: #0d1b2a;
+          padding: 4rem 0;
+        }
+        .cta-strip-inner {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 2rem;
+        }
+        .cta-strip-heading {
+          font-size: clamp(1.8rem, 3.5vw, 2.5rem);
+          font-weight: 800;
+          color: #ffffff;
+          margin-bottom: 0.5rem;
+        }
+        .cta-strip-sub {
+          font-size: 1rem;
+          color: rgba(255,255,255,0.65);
+        }
+        .cta-strip-btn {
+          flex-shrink: 0;
+          padding: 1rem 2.5rem;
+          font-size: 1rem;
+          border-radius: 12px;
+        }
+
+        /* ---- NEED HELP? SPLIT ---- */
+        .help-split {
+          display: flex;
+          min-height: 420px;
+          width: 100%;
+        }
+        .help-left {
+          flex: 1;
+          background: #1a3edb;
+          display: flex;
+          align-items: center;
+        }
+        .help-left-inner {
+          padding: 4rem 3.5rem;
+          max-width: 540px;
+        }
+        .help-heading {
+          font-size: clamp(2rem, 4vw, 3rem);
+          font-weight: 800;
+          color: #ffffff;
+          margin-bottom: 0.5rem;
+        }
+        .help-sub {
+          font-size: 1.15rem;
+          font-weight: 600;
+          color: rgba(255,255,255,0.9);
+          margin-bottom: 1rem;
+        }
+        .help-body {
+          font-size: 0.95rem;
+          color: rgba(255,255,255,0.75);
+          line-height: 1.65;
+        }
+        .help-right {
+          flex: 1;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          position: relative;
+        }
+        .help-right-overlay {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        /* ---- MISC utilities ---- */
         .login-warning-box {
-          background-color: var(--color-gold-light);
-          border: 1px dashed var(--color-gold-border);
-          color: var(--color-gold);
+          background-color: #eef2ff;
+          border: 1px dashed #1a3edb;
+          color: #1a3edb;
           padding: 0.5rem 1rem;
           border-radius: var(--radius-md);
           width: fit-content;
@@ -446,18 +922,72 @@ export default function Home({ selectedAsset, setSelectedAsset, currentUser, onO
           cursor: pointer;
           font-weight: 700;
         }
+
+        /* ---- RESPONSIVE ---- */
+        @media (max-width: 1100px) {
+          .why-grid {
+            grid-template-columns: repeat(2, 1fr);
+          }
+        }
         @media (max-width: 992px) {
           .hero {
             background-attachment: scroll;
             min-height: auto;
+            padding: 4rem 0;
           }
-          .hero-stats-panel {
-            grid-template-columns: 1fr 1fr;
+          .invest-banner {
+            background-attachment: scroll;
+          }
+          .steps-grid {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+          }
+          .purpose-inner {
+            grid-template-columns: 1fr;
+            gap: 2.5rem;
+          }
+          .pricing-grid {
+            grid-template-columns: 1fr;
+            max-width: 420px;
+            margin: 0 auto;
+          }
+          .cta-strip-inner {
+            flex-direction: column;
+            text-align: center;
+          }
+          .help-split {
+            flex-direction: column;
+          }
+          .help-right {
+            min-height: 220px;
           }
         }
         @media (max-width: 768px) {
-          .hero-stats-panel {
+          .why-grid {
             grid-template-columns: 1fr;
+          }
+          .overview-card {
+            padding: 2rem 1.5rem;
+          }
+          .hero-headline {
+            font-size: 2rem;
+          }
+          .invest-banner-box {
+            padding: 2rem 1.5rem;
+          }
+          .help-left-inner {
+            padding: 2.5rem 1.5rem;
+          }
+          .purpose-cards {
+            grid-template-columns: 1fr 1fr !important;
+          }
+        }
+        @media (max-width: 500px) {
+          .pricing-grid {
+            max-width: 100%;
+          }
+          .purpose-cards {
+            grid-template-columns: 1fr !important;
           }
         }
       `}</style>

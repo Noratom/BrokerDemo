@@ -3,32 +3,33 @@
 :root {
   /* Primary Palette */
   --color-white: #ffffff;
-  --color-bg: #f0f6ff;
-  --color-bg-alt: #e0ecff;
+  --color-bg: #ffffff;
+  --color-bg-alt: #f4f6fb;
   --color-bg-card: #ffffff;
-  --color-bg-hero-overlay: rgba(6, 18, 53, 0.72);
+  --color-bg-hero-overlay: rgba(13, 27, 42, 0.75);
 
   /* Blues */
-  --color-blue-deep: #061235;
-  --color-blue-dark: #0a1f4e;
-  --color-blue-royal: #1e40af;
-  --color-blue-primary: #2563eb;
+  --color-blue-deep: #0d1b2a;
+  --color-blue-dark: #0d1b2a;
+  --color-blue-royal: #1a3edb;
+  --color-blue-primary: #2340e0;
   --color-blue-soft: #dbeafe;
-  --color-blue-mist: #eef4ff;
+  --color-blue-mist: #eef2ff;
+  --color-navy: #0d1b2a;
 
-  /* Shining Gold */
-  --color-gold: #c9981a;
-  --color-gold-bright: #f0c430;
-  --color-gold-light: #fdf8ec;
-  --color-gold-border: #f4e8c1;
-  --color-gold-shimmer: linear-gradient(105deg, #c9981a 0%, #f7dc6f 40%, #f0c430 60%, #c9981a 100%);
+  /* Gold replaced with blue — kept as aliases for backward compat */
+  --color-gold: #1a3edb;
+  --color-gold-bright: #2340e0;
+  --color-gold-light: #eef2ff;
+  --color-gold-border: #c7d8f0;
+  --color-gold-shimmer: linear-gradient(105deg, #1a3edb 0%, #4f70f5 40%, #2340e0 60%, #1a3edb 100%);
 
   /* Text */
-  --color-text-dark: #0f172a;
-  --color-text-body: #334155;
-  --color-text-muted: #64748b;
+  --color-text-dark: #111827;
+  --color-text-body: #4b5563;
+  --color-text-muted: #6b7280;
   --color-border: #c7d8f0;
-  --color-border-light: #e0ecff;
+  --color-border-light: #e5e7eb;
 
   /* Indicators */
   --color-success: #10b981;
@@ -48,12 +49,12 @@
   --radius-full: 9999px;
 
   /* Shadows */
-  --shadow-sm: 0 1px 3px rgba(6, 18, 53, 0.06);
-  --shadow-md: 0 4px 14px rgba(6, 18, 53, 0.08);
-  --shadow-lg: 0 12px 32px rgba(6, 18, 53, 0.1);
-  --shadow-premium: 0 24px 48px -12px rgba(6, 18, 53, 0.14);
-  --shadow-gold: 0 8px 24px -4px rgba(201, 152, 26, 0.25);
-  --shadow-blue: 0 8px 24px -4px rgba(30, 64, 175, 0.2);
+  --shadow-sm: 0 1px 3px rgba(13, 27, 42, 0.06);
+  --shadow-md: 0 4px 14px rgba(13, 27, 42, 0.08);
+  --shadow-lg: 0 12px 32px rgba(13, 27, 42, 0.1);
+  --shadow-premium: 0 24px 48px -12px rgba(13, 27, 42, 0.14);
+  --shadow-gold: 0 8px 24px -4px rgba(26, 62, 219, 0.25);
+  --shadow-blue: 0 8px 24px -4px rgba(26, 62, 219, 0.2);
 
   /* Transitions */
   --transition-smooth: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
@@ -97,7 +98,7 @@ img { max-width: 100%; display: block; }
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
   font-weight: 700;
-  color: var(--color-blue-deep);
+  color: var(--color-text-dark);
   line-height: 1.2;
 }
 h1 { font-size: clamp(2.2rem, 5vw, 3.5rem); letter-spacing: -0.03em; }
@@ -109,7 +110,7 @@ h4 { font-size: 1.1rem; }
 .text-success { color: var(--color-success); }
 .text-danger { color: var(--color-danger); }
 .text-center { text-align: center; }
-.text-gold { color: var(--color-gold); }
+.text-gold { color: var(--color-blue-royal); }
 .text-blue { color: var(--color-blue-royal); }
 .text-white { color: var(--color-white); }
 .text-xs { font-size: 0.8rem; }
@@ -155,17 +156,17 @@ h4 { font-size: 1.1rem; }
 .gap-8 { gap: 2rem; }
 .w-full { width: 100%; }
 
-/* ========== SHIMMER GOLD EFFECT ========== */
+/* ========== SHIMMER BLUE EFFECT (replaces gold shimmer) ========== */
 .gold-shimmer {
   background: var(--color-gold-shimmer);
   background-size: 200% auto;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  animation: shimmerGold 3s linear infinite;
+  animation: shimmerBlue 3s linear infinite;
 }
 
-@keyframes shimmerGold {
+@keyframes shimmerBlue {
   0% { background-position: 0% center; }
   100% { background-position: 200% center; }
 }
@@ -173,7 +174,7 @@ h4 { font-size: 1.1rem; }
 .gold-shimmer-bg {
   background: var(--color-gold-shimmer);
   background-size: 200% auto;
-  animation: shimmerGold 3s linear infinite;
+  animation: shimmerBlue 3s linear infinite;
 }
 
 /* ========== BUTTONS ========== */
@@ -211,13 +212,14 @@ h4 { font-size: 1.1rem; }
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--color-blue-royal) 0%, var(--color-blue-primary) 100%);
+  background: #1a3edb;
   color: var(--color-white);
   box-shadow: var(--shadow-blue);
 }
 .btn-primary:hover {
+  background: #2340e0;
   transform: translateY(-3px);
-  box-shadow: 0 12px 28px -4px rgba(30, 64, 175, 0.35);
+  box-shadow: 0 12px 28px -4px rgba(26, 62, 219, 0.35);
 }
 
 .btn-secondary {
@@ -227,32 +229,31 @@ h4 { font-size: 1.1rem; }
 }
 .btn-secondary:hover {
   background-color: var(--color-blue-mist);
-  border-color: var(--color-blue-primary);
+  border-color: var(--color-blue-royal);
   transform: translateY(-3px);
 }
 
+/* btn-gold is now solid blue */
 .btn-gold {
-  background: var(--color-gold-shimmer);
-  background-size: 200% auto;
-  animation: shimmerGold 3s linear infinite;
+  background: #1a3edb;
   color: var(--color-white);
   border: none;
-  box-shadow: var(--shadow-gold);
-  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+  box-shadow: var(--shadow-blue);
 }
 .btn-gold:hover {
+  background: #2340e0;
   transform: translateY(-3px) scale(1.02);
-  box-shadow: 0 16px 32px -4px rgba(201, 152, 26, 0.4);
+  box-shadow: 0 16px 32px -4px rgba(26, 62, 219, 0.4);
 }
 
 .btn-outline-white {
   background: transparent;
   color: var(--color-white);
-  border-color: rgba(255,255,255,0.4);
+  border: 2px solid rgba(255,255,255,0.6);
 }
 .btn-outline-white:hover {
   background: rgba(255,255,255,0.1);
-  border-color: rgba(255,255,255,0.8);
+  border-color: var(--color-white);
   transform: translateY(-3px);
 }
 
@@ -287,7 +288,7 @@ h4 { font-size: 1.1rem; }
   box-shadow: var(--shadow-sm);
 }
 
-.card-gold-accent { border-top: 4px solid var(--color-gold); }
+.card-gold-accent { border-top: 4px solid var(--color-blue-royal); }
 .card-blue-accent { border-top: 4px solid var(--color-blue-royal); }
 
 .card-glass {
@@ -333,8 +334,8 @@ tr:hover td { background-color: var(--color-blue-mist); }
 }
 .form-input:focus {
   outline: none;
-  border-color: var(--color-blue-primary);
-  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+  border-color: var(--color-blue-royal);
+  box-shadow: 0 0 0 4px rgba(26, 62, 219, 0.12);
 }
 .form-input:hover {
   border-color: var(--color-blue-soft);
@@ -429,14 +430,14 @@ tr:hover td { background-color: var(--color-blue-mist); }
   width: fit-content;
 }
 .badge-gold {
-  background-color: var(--color-gold-light);
-  color: var(--color-gold);
+  background-color: var(--color-blue-mist);
+  color: var(--color-blue-royal);
   border: 1px solid var(--color-gold-border);
 }
 .badge-blue {
   background-color: var(--color-blue-soft);
   color: var(--color-blue-royal);
-  border: 1px solid rgba(30, 64, 175, 0.15);
+  border: 1px solid rgba(26, 62, 219, 0.15);
 }
 
 /* ========== RESPONSIVE ========== */

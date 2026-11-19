@@ -1,28 +1,38 @@
 import React from 'react';
-import { Shield, TrendingUp, Menu, X, User, LogOut, Landmark, Settings } from 'lucide-react';
+import { TrendingUp, Shield, Menu, X, User, LogOut, Landmark, Settings } from 'lucide-react';
 
 export default function Navbar({ activePage, setActivePage, currentUser, onLogout, onOpenAuth }) {
   const [isOpen, setIsOpen] = React.useState(false);
 
   const navItems = [
-    { id: 'home', label: 'Home & Trading' },
-    { id: 'about', label: 'Why AuraTrade' },
-    { id: 'contact', label: 'Support & Contact' }
+    { id: 'home', label: 'Home' },
+    { id: 'about', label: 'Company' },
+    { id: 'contact', label: 'Service' },
+    { id: '_investment', label: 'Investment', isAnchor: true, anchor: 'investment' },
+    { id: '_membership', label: 'Membership Portal', isAnchor: true, anchor: 'membership' },
   ];
 
-  const handleNavClick = (id) => {
-    setActivePage(id);
-    setIsOpen(false);
+  const handleNavClick = (item) => {
+    if (item.isAnchor) {
+      setActivePage('home');
+      setIsOpen(false);
+      setTimeout(() => {
+        document.getElementById(item.anchor)?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    } else {
+      setActivePage(item.id);
+      setIsOpen(false);
+    }
   };
 
   return (
     <nav className="navbar">
       <div className="container flex items-center justify-between navbar-container">
         {/* Logo */}
-        <div className="logo flex items-center" onClick={() => handleNavClick('home')} style={{ cursor: 'pointer' }}>
+        <div className="logo flex items-center" onClick={() => { setActivePage('home'); setIsOpen(false); }} style={{ cursor: 'pointer' }}>
           <div className="logo-icon-wrapper">
             <TrendingUp size={24} className="logo-icon-blue" />
-            <Shield size={12} className="logo-icon-gold" />
+            <Shield size={12} className="logo-icon-accent" />
           </div>
           <span className="logo-text">
             AURA<span className="logo-text-accent">TRADE</span>
@@ -34,7 +44,7 @@ export default function Navbar({ activePage, setActivePage, currentUser, onLogou
           {navItems.map(item => (
             <li key={item.id} className="nav-item">
               <button
-                onClick={() => handleNavClick(item.id)}
+                onClick={() => handleNavClick(item)}
                 className={`nav-link ${activePage === item.id ? 'active' : ''}`}
               >
                 {item.label}
@@ -46,10 +56,10 @@ export default function Navbar({ activePage, setActivePage, currentUser, onLogou
           {currentUser && currentUser.role === 'client' && (
             <li className="nav-item">
               <button
-                onClick={() => handleNavClick('dashboard')}
+                onClick={() => { setActivePage('dashboard'); setIsOpen(false); }}
                 className={`nav-link admin-nav-btn flex items-center gap-1 ${activePage === 'dashboard' ? 'active' : ''}`}
               >
-                <Landmark size={14} className="text-gold" />
+                <Landmark size={14} style={{ color: '#1a3edb' }} />
                 Dashboard
               </button>
             </li>
@@ -59,10 +69,10 @@ export default function Navbar({ activePage, setActivePage, currentUser, onLogou
           {currentUser && currentUser.role === 'admin' && (
             <li className="nav-item">
               <button
-                onClick={() => handleNavClick('admin')}
+                onClick={() => { setActivePage('admin'); setIsOpen(false); }}
                 className={`nav-link admin-nav-btn flex items-center gap-1 ${activePage === 'admin' ? 'active' : ''}`}
               >
-                <Settings size={14} className="text-gold" />
+                <Settings size={14} style={{ color: '#1a3edb' }} />
                 Admin Panel
               </button>
             </li>
@@ -75,7 +85,7 @@ export default function Navbar({ activePage, setActivePage, currentUser, onLogou
             <div className="user-profile-badge flex items-center gap-4">
               {currentUser.role === 'client' && (
                 <div className="balance-badge flex items-center gap-2">
-                  <Landmark size={14} className="text-gold" />
+                  <Landmark size={14} style={{ color: '#1a3edb' }} />
                   <span className="font-mono text-sm" style={{ fontWeight: 700 }}>
                     ${currentUser.balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                   </span>
@@ -84,7 +94,7 @@ export default function Navbar({ activePage, setActivePage, currentUser, onLogou
               
               <div 
                 className="user-info flex items-center gap-2" 
-                onClick={() => handleNavClick(currentUser.role === 'admin' ? 'admin' : 'dashboard')}
+                onClick={() => { setActivePage(currentUser.role === 'admin' ? 'admin' : 'dashboard'); }}
                 style={{ cursor: 'pointer' }}
                 title="Go to Dashboard"
               >
@@ -103,7 +113,7 @@ export default function Navbar({ activePage, setActivePage, currentUser, onLogou
               className="btn btn-gold btn-sm"
               onClick={onOpenAuth}
             >
-              Sign In / Open Account
+              Become a Member
             </button>
           )}
         </div>
@@ -121,7 +131,7 @@ export default function Navbar({ activePage, setActivePage, currentUser, onLogou
             {navItems.map(item => (
               <li key={item.id}>
                 <button
-                  onClick={() => handleNavClick(item.id)}
+                  onClick={() => handleNavClick(item)}
                   className={`mobile-nav-link ${activePage === item.id ? 'active' : ''}`}
                 >
                   {item.label}
@@ -132,10 +142,10 @@ export default function Navbar({ activePage, setActivePage, currentUser, onLogou
             {currentUser && currentUser.role === 'client' && (
               <li>
                 <button
-                  onClick={() => handleNavClick('dashboard')}
+                  onClick={() => { setActivePage('dashboard'); setIsOpen(false); }}
                   className={`mobile-nav-link flex items-center gap-2 ${activePage === 'dashboard' ? 'active' : ''}`}
                 >
-                  <Landmark size={16} className="text-gold" />
+                  <Landmark size={16} style={{ color: '#1a3edb' }} />
                   Dashboard
                 </button>
               </li>
@@ -144,10 +154,10 @@ export default function Navbar({ activePage, setActivePage, currentUser, onLogou
             {currentUser && currentUser.role === 'admin' && (
               <li>
                 <button
-                  onClick={() => handleNavClick('admin')}
+                  onClick={() => { setActivePage('admin'); setIsOpen(false); }}
                   className={`mobile-nav-link flex items-center gap-2 ${activePage === 'admin' ? 'active' : ''}`}
                 >
-                  <Settings size={16} className="text-gold" />
+                  <Settings size={16} style={{ color: '#1a3edb' }} />
                   Admin Panel
                 </button>
               </li>
@@ -155,16 +165,16 @@ export default function Navbar({ activePage, setActivePage, currentUser, onLogou
 
             <li>
               {currentUser ? (
-                <div className="flex flex-col gap-3" style={{ borderTop: '1px solid var(--color-border)', paddingTop: '1rem' }}>
+                <div className="flex flex-col gap-3" style={{ borderTop: '1px solid rgba(255,255,255,0.15)', paddingTop: '1rem' }}>
                   <div className="flex justify-between items-center">
-                    <span className="text-xs text-muted">User: {currentUser.name}</span>
+                    <span className="text-xs" style={{ color: 'rgba(255,255,255,0.7)' }}>User: {currentUser.name}</span>
                     {currentUser.role === 'client' && (
-                      <span className="font-mono text-sm" style={{ fontWeight: 700 }}>
+                      <span className="font-mono text-sm" style={{ fontWeight: 700, color: '#fff' }}>
                         ${currentUser.balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                       </span>
                     )}
                   </div>
-                  <button className="btn btn-secondary btn-sm w-full" onClick={() => { onLogout(); setIsOpen(false); }}>
+                  <button className="btn btn-outline-white btn-sm w-full" onClick={() => { onLogout(); setIsOpen(false); }}>
                     <LogOut size={14} /> Sign Out
                   </button>
                 </div>
@@ -177,7 +187,7 @@ export default function Navbar({ activePage, setActivePage, currentUser, onLogou
                     onOpenAuth();
                   }}
                 >
-                  Sign In / Register
+                  Become a Member
                 </button>
               )}
             </li>
@@ -185,11 +195,11 @@ export default function Navbar({ activePage, setActivePage, currentUser, onLogou
         </div>
       )}
 
-      {/* Styled inline elements specific to Navbar */}
+      {/* Navbar Styles */}
       <style>{`
         .navbar {
-          background-color: var(--color-white);
-          border-bottom: 1px solid var(--color-border-light);
+          background-color: #0d1b2a;
+          border-bottom: 1px solid rgba(255,255,255,0.08);
           position: sticky;
           top: 0;
           z-index: 1000;
@@ -207,14 +217,14 @@ export default function Navbar({ activePage, setActivePage, currentUser, onLogou
           margin-right: 0.5rem;
         }
         .logo-icon-blue {
-          color: var(--color-blue-royal);
+          color: #1a3edb;
         }
-        .logo-icon-gold {
-          color: var(--color-gold);
+        .logo-icon-accent {
+          color: #ffffff;
           position: absolute;
           bottom: -2px;
           right: -2px;
-          background: var(--color-white);
+          background: #0d1b2a;
           border-radius: 50%;
         }
         .logo-text {
@@ -222,31 +232,32 @@ export default function Navbar({ activePage, setActivePage, currentUser, onLogou
           font-weight: 800;
           font-size: 1.4rem;
           letter-spacing: 0.05em;
-          color: var(--color-blue-deep);
+          color: #ffffff;
         }
         .logo-text-accent {
-          color: var(--color-gold);
+          color: #1a3edb;
         }
         .nav-menu {
           list-style: none;
-          gap: 2rem;
+          gap: 1.75rem;
         }
         .nav-link {
           background: none;
           border: none;
-          color: var(--color-text-muted);
+          color: rgba(255,255,255,0.75);
           font-weight: 500;
           cursor: pointer;
-          font-size: 0.95rem;
+          font-size: 0.9rem;
           padding: 0.5rem 0;
           position: relative;
           transition: var(--transition-fast);
+          white-space: nowrap;
         }
         .nav-link:hover {
-          color: var(--color-blue-royal);
+          color: #ffffff;
         }
         .nav-link.active {
-          color: var(--color-blue-deep);
+          color: #ffffff;
           font-weight: 600;
         }
         .nav-link.active::after {
@@ -256,40 +267,41 @@ export default function Navbar({ activePage, setActivePage, currentUser, onLogou
           left: 0;
           width: 100%;
           height: 2px;
-          background-color: var(--color-gold);
+          background-color: #1a3edb;
           border-radius: var(--radius-full);
         }
         .admin-nav-btn {
-          color: var(--color-gold) !important;
-        }
-        .admin-nav-btn.active::after {
-          background-color: var(--color-blue-royal) !important;
+          color: rgba(255,255,255,0.9) !important;
         }
         .balance-badge {
-          background-color: var(--color-gold-light);
-          border: 1px solid var(--color-gold-border);
-          color: var(--color-gold);
-          padding: 0.25rem 0.5rem;
+          background-color: rgba(26, 62, 219, 0.2);
+          border: 1px solid rgba(26, 62, 219, 0.4);
+          color: #fff;
+          padding: 0.25rem 0.65rem;
           border-radius: var(--radius-sm);
         }
         .user-info {
-          background-color: var(--color-bg);
-          padding: 0.25rem 0.5rem;
+          background-color: rgba(255,255,255,0.08);
+          padding: 0.3rem 0.6rem;
           border-radius: var(--radius-sm);
-          border: 1px solid var(--color-border-light);
+          border: 1px solid rgba(255,255,255,0.15);
+          color: #fff;
+        }
+        .user-name {
+          color: #fff;
         }
         .avatar {
-          width: 20px;
-          height: 20px;
+          width: 22px;
+          height: 22px;
           border-radius: 50%;
-          background-color: var(--color-blue-royal);
+          background-color: #1a3edb;
           color: var(--color-white);
         }
         .logout-btn {
           background: none;
           border: none;
           cursor: pointer;
-          color: var(--color-text-muted);
+          color: rgba(255,255,255,0.6);
           transition: var(--transition-fast);
         }
         .logout-btn:hover {
@@ -300,10 +312,18 @@ export default function Navbar({ activePage, setActivePage, currentUser, onLogou
           background: none;
           border: none;
           cursor: pointer;
-          color: var(--color-blue-deep);
+          color: #ffffff;
         }
         .mobile-drawer {
           display: none;
+        }
+        @media (max-width: 1100px) {
+          .nav-menu {
+            gap: 1.1rem;
+          }
+          .nav-link {
+            font-size: 0.82rem;
+          }
         }
         @media (max-width: 992px) {
           .nav-menu {
@@ -318,31 +338,36 @@ export default function Navbar({ activePage, setActivePage, currentUser, onLogou
             top: 70px;
             left: 0;
             width: 100%;
-            background-color: var(--color-white);
-            border-bottom: 1px solid var(--color-border);
+            background-color: #0d1b2a;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
             padding: 1.5rem;
             box-shadow: var(--shadow-lg);
+            z-index: 999;
           }
           .mobile-nav-list {
             list-style: none;
-            gap: 1rem;
+            gap: 0.5rem;
           }
           .mobile-nav-link {
             background: none;
             border: none;
             text-align: left;
             width: 100%;
-            font-size: 1.1rem;
+            font-size: 1rem;
             padding: 0.75rem 0;
             font-weight: 500;
-            color: var(--color-text-dark);
+            color: rgba(255,255,255,0.8);
             cursor: pointer;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+          }
+          .mobile-nav-link:hover {
+            color: #ffffff;
           }
           .mobile-nav-link.active {
-            color: var(--color-blue-royal);
+            color: #ffffff;
             font-weight: 700;
-            border-left: 3px solid var(--color-gold);
-            padding-left: 0.5rem;
+            border-left: 3px solid #1a3edb;
+            padding-left: 0.75rem;
           }
           .nav-actions {
             margin-right: 1rem;
