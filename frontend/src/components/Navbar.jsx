@@ -319,10 +319,10 @@ export default function Navbar({ activePage, setActivePage, currentUser, onLogou
         }
         @media (max-width: 1100px) {
           .nav-menu {
-            gap: 1.1rem;
+            gap: 1rem;
           }
           .nav-link {
-            font-size: 0.82rem;
+            font-size: 0.8rem;
           }
         }
         @media (max-width: 992px) {
@@ -340,25 +340,28 @@ export default function Navbar({ activePage, setActivePage, currentUser, onLogou
             width: 100%;
             background-color: #0d1b2a;
             border-bottom: 1px solid rgba(255,255,255,0.1);
-            padding: 1.5rem;
+            padding: 1rem 1.25rem 1.5rem;
             box-shadow: var(--shadow-lg);
             z-index: 999;
+            max-height: calc(100vh - 70px);
+            overflow-y: auto;
           }
           .mobile-nav-list {
             list-style: none;
-            gap: 0.5rem;
+            gap: 0;
           }
           .mobile-nav-link {
             background: none;
             border: none;
             text-align: left;
             width: 100%;
-            font-size: 1rem;
-            padding: 0.75rem 0;
+            font-size: 0.95rem;
+            padding: 0.8rem 0;
             font-weight: 500;
             color: rgba(255,255,255,0.8);
             cursor: pointer;
             border-bottom: 1px solid rgba(255,255,255,0.07);
+            display: block;
           }
           .mobile-nav-link:hover {
             color: #ffffff;
@@ -370,7 +373,31 @@ export default function Navbar({ activePage, setActivePage, currentUser, onLogou
             padding-left: 0.75rem;
           }
           .nav-actions {
-            margin-right: 1rem;
+            margin-right: 0.75rem;
+          }
+          /* hide balance badge on tablet — show only in drawer */
+          .balance-badge {
+            display: none;
+          }
+        }
+        @media (max-width: 480px) {
+          .navbar {
+            height: 62px;
+          }
+          .mobile-drawer {
+            top: 62px;
+            max-height: calc(100vh - 62px);
+          }
+          .logo-text {
+            font-size: 1.15rem;
+          }
+          /* Show balance badge in drawer only */
+          .balance-badge {
+            display: none;
+          }
+          .nav-actions .btn {
+            font-size: 0.8rem;
+            padding: 0.5rem 0.9rem;
           }
         }
       `}</style>

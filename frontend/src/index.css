@@ -443,10 +443,19 @@ tr:hover td { background-color: var(--color-blue-mist); }
 /* ========== RESPONSIVE ========== */
 @media (max-width: 992px) {
   .grid-cols-3, .grid-cols-4 { grid-template-columns: repeat(2, 1fr); }
+  .section { padding: 4rem 0; }
+  .container { padding: 0 1.25rem; }
 }
 @media (max-width: 768px) {
   .grid-cols-2, .grid-cols-3, .grid-cols-4 { grid-template-columns: 1fr; }
   .section { padding: 3rem 0; }
+  .container { padding: 0 1rem; }
   .flex-col-mobile { flex-direction: column; }
   .hide-mobile { display: none; }
+}
+@media (max-width: 480px) {
+  .section { padding: 2.25rem 0; }
+  .container { padding: 0 0.875rem; }
+  h1 { font-size: clamp(1.6rem, 7vw, 2.2rem); }
+  h2 { font-size: clamp(1.3rem, 5vw, 1.8rem); }
 }

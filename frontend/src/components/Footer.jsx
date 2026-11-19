@@ -200,23 +200,48 @@ export default function Footer({ setActivePage }) {
         @media (max-width: 992px) {
           .footer-grid {
             grid-template-columns: 1fr 1fr;
-            gap: 2rem;
+            gap: 2rem 2.5rem;
           }
           .footer-brand {
             grid-column: span 2;
           }
+          .footer-desc {
+            max-width: 100%;
+          }
         }
         @media (max-width: 600px) {
+          .footer {
+            padding: 3rem 0 0;
+          }
           .footer-grid {
             grid-template-columns: 1fr;
+            gap: 2rem;
           }
           .footer-brand {
             grid-column: span 1;
           }
+          .footer-top {
+            padding-bottom: 2rem;
+          }
           .footer-bottom {
             flex-direction: column;
-            gap: 1rem;
+            gap: 0.75rem;
             text-align: center;
+            padding: 1.25rem 0;
+          }
+          .footer-bottom div {
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.75rem;
+          }
+        }
+        @media (max-width: 400px) {
+          .footer-col-title {
+            font-size: 0.85rem;
+          }
+          .footer-link-btn,
+          .footer-contact-list {
+            font-size: 0.82rem;
           }
         }
       `}</style>

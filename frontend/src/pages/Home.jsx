@@ -924,70 +924,283 @@ export default function Home({ selectedAsset, setSelectedAsset, currentUser, onO
         }
 
         /* ---- RESPONSIVE ---- */
+
+        /* Tablet large (≤1100px) */
         @media (max-width: 1100px) {
           .why-grid {
             grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+          }
+          .pricing-grid {
+            gap: 1.5rem;
           }
         }
+
+        /* Tablet (≤992px) */
         @media (max-width: 992px) {
+          /* Hero */
           .hero {
             background-attachment: scroll;
-            min-height: auto;
-            padding: 4rem 0;
+            min-height: 70vh;
+            padding: 5rem 0 4rem;
           }
-          .invest-banner {
-            background-attachment: scroll;
+          .hero-headline {
+            font-size: clamp(1.9rem, 5vw, 2.8rem);
+          }
+          .hero-desc {
+            font-size: 1rem;
+          }
+          .hero-cta-row {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.75rem;
+          }
+          .hero-cta-row .btn {
+            width: 100%;
+            max-width: 320px;
+            justify-content: center;
+          }
+
+          /* Steps strip */
+          .steps-strip {
+            padding: 2.5rem 0;
           }
           .steps-grid {
             grid-template-columns: 1fr;
-            gap: 1.5rem;
+            gap: 0;
           }
+          .step-item {
+            padding: 1.25rem 1rem;
+            border-bottom: 1px solid #e5e7eb;
+          }
+          .step-item:last-child {
+            border-bottom: none;
+          }
+
+          /* Purpose */
           .purpose-inner {
             grid-template-columns: 1fr;
-            gap: 2.5rem;
+            gap: 2rem;
           }
+          .purpose-cards {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+
+          /* Investment banner */
+          .invest-banner {
+            background-attachment: scroll;
+            min-height: 260px;
+          }
+          .invest-banner-box {
+            padding: 2rem 2rem;
+            margin: 0 1rem;
+          }
+
+          /* Pricing */
           .pricing-grid {
             grid-template-columns: 1fr;
-            max-width: 420px;
+            max-width: 460px;
             margin: 0 auto;
+            gap: 1.5rem;
+          }
+
+          /* Why grid */
+          .why-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.25rem;
+          }
+
+          /* Overview card */
+          .overview-card {
+            padding: 2.5rem 2rem;
+          }
+
+          /* CTA Strip */
+          .cta-strip {
+            padding: 3rem 0;
           }
           .cta-strip-inner {
             flex-direction: column;
             text-align: center;
+            gap: 1.5rem;
           }
+          .cta-strip-btn {
+            width: 100%;
+            max-width: 320px;
+          }
+
+          /* Need Help split */
           .help-split {
             flex-direction: column;
+            min-height: auto;
+          }
+          .help-left {
+            min-height: 320px;
           }
           .help-right {
-            min-height: 220px;
-          }
-        }
-        @media (max-width: 768px) {
-          .why-grid {
-            grid-template-columns: 1fr;
-          }
-          .overview-card {
-            padding: 2rem 1.5rem;
-          }
-          .hero-headline {
-            font-size: 2rem;
-          }
-          .invest-banner-box {
-            padding: 2rem 1.5rem;
+            min-height: 240px;
           }
           .help-left-inner {
-            padding: 2.5rem 1.5rem;
-          }
-          .purpose-cards {
-            grid-template-columns: 1fr 1fr !important;
+            padding: 3rem 2rem;
           }
         }
-        @media (max-width: 500px) {
+
+        /* Mobile (≤768px) */
+        @media (max-width: 768px) {
+          /* Hero */
+          .hero {
+            min-height: 60vh;
+            padding: 4rem 0 3rem;
+          }
+          .hero-headline {
+            font-size: clamp(1.7rem, 7vw, 2.2rem);
+          }
+          .hero-desc {
+            font-size: 0.95rem;
+          }
+          .hero-cta-row .btn {
+            max-width: 100%;
+          }
+
+          /* Steps */
+          .steps-strip {
+            padding: 2rem 0;
+          }
+
+          /* Purpose */
+          .purpose-section.section {
+            padding: 3rem 0;
+          }
+
+          /* Invest banner */
+          .invest-banner {
+            min-height: 220px;
+          }
+          .invest-banner-box {
+            padding: 1.75rem 1.25rem;
+            margin: 0 0.75rem;
+            border-radius: 12px;
+          }
+          .invest-banner-title {
+            font-size: 1.6rem;
+          }
+          .invest-banner-sub {
+            font-size: 0.9rem;
+          }
+
+          /* Pricing */
           .pricing-grid {
             max-width: 100%;
           }
+          .pricing-cta {
+            margin: 1.5rem 1.5rem 0.5rem;
+          }
+          .pricing-features {
+            padding: 0 1.5rem;
+          }
+          .pricing-note {
+            padding: 0 1.5rem 1.25rem;
+          }
+          .pricing-card-header {
+            padding: 1.25rem 1.5rem 1rem;
+          }
+          .pricing-roi {
+            padding: 1rem 1.5rem 0;
+            font-size: 3rem;
+          }
+          .pricing-divider {
+            margin: 1.25rem 1.5rem;
+          }
+
+          /* Why choose us */
+          .why-section.section {
+            padding: 3rem 0;
+          }
+          .why-header {
+            margin-bottom: 2rem;
+          }
+          .why-grid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+          }
+          .why-card {
+            padding: 1.5rem 1.25rem;
+            flex-direction: row;
+            align-items: flex-start;
+            gap: 1rem;
+          }
+          .why-icon-wrap {
+            flex-shrink: 0;
+          }
+
+          /* Overview */
+          .overview-card {
+            padding: 2rem 1.25rem;
+            border-radius: 14px;
+          }
+          .overview-heading {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+          }
+
+          /* CTA strip */
+          .cta-strip {
+            padding: 2.5rem 0;
+          }
+          .cta-strip-heading {
+            font-size: 1.75rem;
+          }
+
+          /* Need Help */
+          .help-left {
+            min-height: 280px;
+          }
+          .help-left-inner {
+            padding: 2.5rem 1.25rem;
+          }
+          .help-heading {
+            font-size: 2rem;
+          }
+          .help-right {
+            min-height: 180px;
+          }
+
+          /* Purpose cards */
+          .purpose-cards {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 0.75rem !important;
+          }
+        }
+
+        /* Small mobile (≤480px) */
+        @media (max-width: 480px) {
+          .hero {
+            padding: 3.5rem 0 2.5rem;
+          }
+          .hero-headline {
+            font-size: 1.65rem;
+            letter-spacing: -0.01em;
+          }
+          .steps-strip {
+            padding: 1.5rem 0;
+          }
           .purpose-cards {
             grid-template-columns: 1fr !important;
+          }
+          .pricing-grid {
+            gap: 1rem;
+          }
+          .why-grid {
+            gap: 0.75rem;
+          }
+          .cta-strip-heading {
+            font-size: 1.5rem;
+          }
+          .cta-strip-btn {
+            padding: 0.9rem 1.5rem;
+          }
+          .help-heading {
+            font-size: 1.75rem;
           }
         }
       `}</style>
