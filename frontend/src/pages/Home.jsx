@@ -1170,6 +1170,22 @@ export default function Home({ selectedAsset, setSelectedAsset, currentUser, onO
             grid-template-columns: repeat(2, 1fr) !important;
             gap: 0.75rem !important;
           }
+
+          /* Trading desk + Market rates section tighten */
+          #trading-desk .container {
+            gap: 1.25rem;
+          }
+          #trading-desk .text-center {
+            margin-bottom: 0.75rem !important;
+          }
+          #market-rates .text-center {
+            margin-bottom: 1.25rem !important;
+          }
+
+          /* Investment plans section header tighten */
+          #account-tiers .text-center {
+            margin-bottom: 0.5rem !important;
+          }
         }
 
         /* Small mobile (≤480px) */
@@ -1184,23 +1200,108 @@ export default function Home({ selectedAsset, setSelectedAsset, currentUser, onO
           .steps-strip {
             padding: 1.5rem 0;
           }
+          .step-title {
+            font-size: 1rem;
+          }
+          .step-desc {
+            font-size: 0.82rem;
+          }
           .purpose-cards {
             grid-template-columns: 1fr !important;
           }
+
+          /* Pricing cards — tighten everything */
           .pricing-grid {
             gap: 1rem;
           }
+          .pricing-card-header {
+            padding: 1rem 1.25rem 0.85rem;
+          }
+          .pricing-card-name {
+            font-size: 1.25rem;
+          }
+          .pricing-card-service {
+            font-size: 0.65rem;
+          }
+          .pricing-roi {
+            font-size: 2.5rem;
+            padding: 0.75rem 1.25rem 0;
+          }
+          .pricing-roi-label {
+            font-size: 0.7rem;
+            padding: 0.25rem 1.25rem 0;
+          }
+          .pricing-divider {
+            margin: 1rem 1.25rem;
+          }
+          .pricing-features {
+            padding: 0 1.25rem;
+            gap: 0.6rem;
+          }
+          .pricing-feature-item {
+            font-size: 0.82rem;
+          }
+          .pricing-cta {
+            margin: 1.25rem 1.25rem 0.5rem;
+            padding: 0.7rem 1rem;
+            font-size: 0.9rem;
+          }
+          .pricing-note {
+            padding: 0 1.25rem 1rem;
+            font-size: 0.7rem;
+          }
+
+          /* Investment banner */
+          .invest-banner {
+            min-height: 180px;
+          }
+          .invest-banner-box {
+            padding: 1.5rem 1rem;
+            margin: 0 0.5rem;
+            border-radius: 10px;
+          }
+          .invest-banner-title {
+            font-size: 1.35rem;
+          }
+          .invest-banner-sub {
+            font-size: 0.82rem;
+          }
+
           .why-grid {
             gap: 0.75rem;
           }
+          .why-card {
+            padding: 1.25rem 1rem;
+          }
+          .why-title {
+            font-size: 0.9rem;
+          }
+          .why-desc {
+            font-size: 0.8rem;
+          }
           .cta-strip-heading {
             font-size: 1.5rem;
+          }
+          .cta-strip-sub {
+            font-size: 0.9rem;
           }
           .cta-strip-btn {
             padding: 0.9rem 1.5rem;
           }
           .help-heading {
             font-size: 1.75rem;
+          }
+          .help-sub {
+            font-size: 1rem;
+          }
+          .help-body {
+            font-size: 0.85rem;
+          }
+          .overview-heading {
+            font-size: 1.3rem;
+          }
+          .overview-body p {
+            font-size: 0.88rem;
           }
         }
       `}</style>
