@@ -775,12 +775,150 @@ export default function TradingSimulator({ selectedAsset, setSelectedAsset, curr
           color: var(--color-white);
           border-color: var(--color-danger);
         }
+        /* ---- Simulator & Positions Responsive ---- */
         @media (max-width: 992px) {
+          .simulator-stats-grid {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.85rem;
+          }
+          .stat-card {
+            padding: 1rem;
+          }
+          .stat-val {
+            font-size: 1.15rem;
+          }
           .simulator-body {
             grid-template-columns: 1fr;
+            gap: 1.5rem;
           }
           .chart-card {
             grid-column: span 1;
+            min-height: 320px;
+          }
+          .control-card {
+            padding: 1.5rem;
+          }
+          .positions-card {
+            padding: 1.25rem;
+          }
+        }
+
+        @media (max-width: 768px) {
+          .simulator-stats-grid {
+            grid-template-columns: 1fr;
+            gap: 0.65rem;
+          }
+          .stat-card {
+            padding: 0.85rem 1rem;
+          }
+          .stat-icon-wrapper {
+            width: 38px;
+            height: 38px;
+          }
+          .stat-val {
+            font-size: 1.1rem;
+          }
+          .simulator-body {
+            gap: 1rem;
+            margin-top: 1rem !important;
+          }
+          .chart-card {
+            padding: 1rem;
+            min-height: 280px;
+          }
+          .chart-header {
+            flex-direction: column;
+            gap: 0.5rem;
+            align-items: flex-start;
+          }
+          .chart-asset-title {
+            font-size: 1.25rem;
+          }
+          .chart-price-display {
+            font-size: 1.6rem;
+          }
+          .svg-chart-container {
+            height: 190px;
+          }
+          .control-card {
+            padding: 1.25rem 1rem;
+          }
+          .control-title {
+            font-size: 1.1rem;
+          }
+          .execution-buttons-wrapper {
+            gap: 0.5rem;
+          }
+          .btn-label-action {
+            font-size: 0.65rem;
+          }
+          .btn-price-val {
+            font-size: 0.85rem;
+          }
+
+          /* Active Working Positions mobile card & table */
+          .positions-card {
+            padding: 1rem 0.75rem;
+            margin-top: 1.25rem !important;
+            border-radius: var(--radius-md);
+          }
+          .positions-card h4 {
+            font-size: 0.95rem;
+            margin-bottom: 0.75rem !important;
+          }
+          .positions-card .table-container {
+            border-radius: 8px;
+            -webkit-overflow-scrolling: touch;
+            border: 1px solid var(--color-border-light);
+          }
+          .positions-card table th,
+          .positions-card table td {
+            padding: 0.65rem 0.65rem;
+            font-size: 0.78rem;
+            white-space: nowrap;
+          }
+          .btn-close-pos {
+            padding: 0.35rem 0.6rem;
+            font-size: 0.7rem;
+            white-space: nowrap;
+          }
+          .notification {
+            left: 12px;
+            right: 12px;
+            top: 75px;
+            font-size: 0.85rem;
+            padding: 0.75rem 1rem;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .chart-card {
+            padding: 0.75rem;
+            min-height: 240px;
+          }
+          .chart-asset-title {
+            font-size: 1.1rem;
+          }
+          .chart-price-display {
+            font-size: 1.35rem;
+          }
+          .svg-chart-container {
+            height: 160px;
+          }
+          .control-card {
+            padding: 1rem 0.85rem;
+          }
+          .margin-summary-card {
+            padding: 0.5rem 0.65rem;
+            font-size: 0.75rem;
+          }
+          .positions-card {
+            padding: 0.85rem 0.5rem;
+          }
+          .positions-card table th,
+          .positions-card table td {
+            padding: 0.5rem 0.5rem;
+            font-size: 0.75rem;
           }
         }
       `}</style>

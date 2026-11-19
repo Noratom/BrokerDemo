@@ -261,9 +261,86 @@ export default function MarketTable({ onSelectAsset }) {
           font-family: monospace;
           font-size: 0.9rem;
         }
-        @media (max-width: 768px) {
+        /* ---- Real-Time Market Rates Responsive ---- */
+        @media (max-width: 992px) {
+          .markets-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+          }
+          .markets-title {
+            font-size: 1.5rem;
+          }
           .search-container {
             width: 100%;
+          }
+        }
+
+        @media (max-width: 768px) {
+          .markets-header {
+            margin-bottom: 1rem !important;
+            gap: 0.75rem;
+          }
+          .markets-title {
+            font-size: 1.3rem;
+          }
+          .tabs-container {
+            gap: 0.35rem;
+            margin-bottom: 0.75rem;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 4px;
+          }
+          .tab-btn {
+            padding: 0.5rem 0.85rem;
+            font-size: 0.8rem;
+          }
+          .table-container {
+            border-radius: 8px;
+            -webkit-overflow-scrolling: touch;
+          }
+          .table-container table th,
+          .table-container table td {
+            padding: 0.6rem 0.65rem;
+            font-size: 0.78rem;
+            white-space: nowrap;
+          }
+          .asset-symbol {
+            font-size: 0.85rem;
+          }
+          .asset-name {
+            font-size: 0.7rem;
+          }
+          .change-badge {
+            font-size: 0.72rem;
+            padding: 0.15rem 0.35rem;
+          }
+          .btn-trade-action {
+            padding: 0.35rem 0.6rem;
+            font-size: 0.72rem;
+          }
+          .font-mono {
+            font-size: 0.78rem;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .markets-title {
+            font-size: 1.15rem;
+          }
+          .search-container {
+            padding: 0.4rem 0.75rem;
+          }
+          .search-input {
+            font-size: 0.8rem;
+          }
+          .tab-btn {
+            padding: 0.4rem 0.65rem;
+            font-size: 0.75rem;
+          }
+          .table-container table th,
+          .table-container table td {
+            padding: 0.5rem 0.45rem;
+            font-size: 0.72rem;
           }
         }
       `}</style>
