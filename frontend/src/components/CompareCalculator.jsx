@@ -5,7 +5,7 @@ export default function CompareCalculator() {
   const [loanAmount, setLoanAmount] = useState(50000); // initial margin loan size
 
   // Annual Margin Interest Rates
-  const auraRate = 5.37; // AuraTrade premium low rate
+  const continuumRate = 4.85; // Continuum Trading institutional rate
   const competitorARate = 11.50; // standard markup broker rate
   const competitorBRate = 9.25;
 
@@ -14,13 +14,13 @@ export default function CompareCalculator() {
     return (amount * (annualRate / 100)) / 12;
   };
 
-  const auraMonthly = calculateMonthlyCost(loanAmount, auraRate);
+  const continuumMonthly = calculateMonthlyCost(loanAmount, continuumRate);
   const compAMonthly = calculateMonthlyCost(loanAmount, competitorARate);
   const compBMonthly = calculateMonthlyCost(loanAmount, competitorBRate);
 
-  const auraAnnual = auraMonthly * 12;
+  const continuumAnnual = continuumMonthly * 12;
   const compAAnnual = compAMonthly * 12;
-  const annualSavings = compAAnnual - auraAnnual;
+  const annualSavings = compAAnnual - continuumAnnual;
 
   return (
     <div className="card compare-calculator-card">
@@ -76,18 +76,18 @@ export default function CompareCalculator() {
           <h4 className="text-xs text-muted font-label uppercase" style={{ letterSpacing: '0.05em' }}>Margin Interest Comparison</h4>
           
           <div className="output-rows flex flex-col gap-3">
-            {/* AuraTrade Row */}
+            {/* Continuum Trading Row */}
             <div className="output-row aura-row flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="rate-badge bg-gold">{auraRate}%</div>
+                <div className="rate-badge bg-gold">{continuumRate}%</div>
                 <div>
-                  <strong className="text-dark block" style={{ fontSize: '0.9rem' }}>AuraTrade Raw ECN</strong>
+                  <strong className="text-dark block" style={{ fontSize: '0.9rem' }}>Continuum Trading Raw ECN</strong>
                   <span className="text-xxs text-muted" style={{ fontSize: '0.7rem' }}>Benchmark + 1.5% markup</span>
                 </div>
               </div>
               <div className="text-right font-mono">
-                <span className="monthly-cost-val block">${auraMonthly.toLocaleString(undefined, { maximumFractionDigits: 0 })}/mo</span>
-                <span className="annual-cost-val text-muted text-xxs">${auraAnnual.toLocaleString(undefined, { maximumFractionDigits: 0 })}/yr</span>
+                <span className="monthly-cost-val block">${continuumMonthly.toLocaleString(undefined, { maximumFractionDigits: 0 })}/mo</span>
+                <span className="annual-cost-val text-muted text-xxs">${continuumAnnual.toLocaleString(undefined, { maximumFractionDigits: 0 })}/yr</span>
               </div>
             </div>
 
@@ -126,7 +126,7 @@ export default function CompareCalculator() {
 
       <div className="flex items-center gap-2 text-xxs text-muted margin-disclaimer" style={{ fontSize: '0.7rem', marginTop: '1.5rem', borderTop: '1px solid var(--color-border-light)', paddingTop: '0.75rem' }}>
         <AlertCircle size={12} className="text-muted" />
-        <span>Margin rates are variable based on Fed benchmark rates. AuraTrade margin loans are only available to verified retail accounts with positive equity values.</span>
+        <span>Margin rates are variable based on Fed benchmark rates. Continuum Trading margin facilities are only available to verified retail accounts with positive equity values.</span>
       </div>
 
       <style>{`

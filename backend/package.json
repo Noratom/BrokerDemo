@@ -1,7 +1,7 @@
 {
   "name": "aura-trade-backend",
   "version": "1.0.0",
-  "description": "Mock trading backend for AuraTrade",
+  "description": "Institutional trading backend for Continuum Trading",
   "main": "server.js",
   "type": "module",
   "scripts": {

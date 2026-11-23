@@ -17,7 +17,7 @@ export default function About() {
     },
     {
       title: 'Global Regulatory Licenses',
-      desc: 'AuraTrade is fully authorized and audited regularly by top national licensing departments to ensure strict financial reporting.'
+      desc: 'Continuum Trading is fully authorized and audited regularly by top national licensing departments to ensure strict financial reporting.'
     }
   ];
 
@@ -30,9 +30,9 @@ export default function About() {
             <Award size={16} />
             <span>Built by Traders, for Traders</span>
           </div>
-          <h1 style={{ marginTop: '1rem' }}>The AuraTrade Standard</h1>
+          <h1 style={{ marginTop: '1rem' }}>The Continuum Trading Standard</h1>
           <p className="text-muted" style={{ maxWidth: '650px', marginInline: 'auto', marginTop: '0.75rem', fontSize: '1.1rem' }}>
-            Founded in 2018, AuraTrade is a global brokerage company established to deliver institutional liquidity conditions to retail traders worldwide.
+            Founded in 2018, Continuum Trading & Brokerage Ltd is a global brokerage company established to deliver institutional liquidity conditions to retail traders worldwide.
           </p>
         </div>
       </section>
@@ -44,7 +44,7 @@ export default function About() {
             <div>
               <h2>Safe. Transparent. Regulated.</h2>
               <p className="text-muted" style={{ marginTop: '1rem', lineHeight: '1.6' }}>
-                We believe that the baseline of any successful trading career is a secure environment. AuraTrade provides the security framework of an institutional clearing house combined with the accessibility of a retail trading client portal.
+                We believe that the baseline of any successful trading career is a secure environment. Continuum Trading provides the security framework of an institutional clearing house combined with the accessibility of a retail trading client portal.
               </p>
               
               <div className="flex flex-col gap-4" style={{ marginTop: '2rem' }}>

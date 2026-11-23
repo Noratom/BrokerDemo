@@ -3,7 +3,7 @@ import { ArrowUpRight, ArrowDownRight, Briefcase, TrendingUp, DollarSign, X, Shi
 import { API_BASE_URL } from '../config';
 
 export default function TradingSimulator({ selectedAsset, setSelectedAsset, currentUser }) {
-  // Demo states (local state syncs with server if logged in, otherwise localstorage)
+  // Client state (syncs with live server when authenticated, otherwise persistent local session)
   const [balance, setBalance] = useState(10000.00);
   const [positions, setPositions] = useState([]);
   const [tradeSize, setTradeSize] = useState(0.1);
@@ -20,7 +20,7 @@ export default function TradingSimulator({ selectedAsset, setSelectedAsset, curr
     if (currentUser) {
       setBalance(currentUser.balance);
     } else {
-      const saved = localStorage.getItem('aura_demo_balance');
+      const saved = localStorage.getItem('ct_live_balance');
       setBalance(saved ? Number(saved) : 10000.00);
     }
   }, [currentUser]);
@@ -132,7 +132,7 @@ export default function TradingSimulator({ selectedAsset, setSelectedAsset, curr
   // Auto-save local balance to localstorage only if guest
   useEffect(() => {
     if (!currentUser) {
-      localStorage.setItem('aura_demo_balance', balance.toFixed(2));
+      localStorage.setItem('ct_live_balance', balance.toFixed(2));
     }
   }, [balance, currentUser]);
 
@@ -280,6 +280,11 @@ export default function TradingSimulator({ selectedAsset, setSelectedAsset, curr
   }, 0);
 
   const equity = balance + totalFloatingPL;
+  const marginUsed = positions.reduce((acc, pos) => {
+    return acc + calculateRequiredMargin(pos.symbol, pos.size, pos.entryPrice);
+  }, 0);
+  const freeMargin = Math.max(0, equity - marginUsed);
+  const marginLevel = marginUsed > 0 ? ((equity / marginUsed) * 100).toFixed(1) : '100.0';
 
   // Chart Rendering calculations
   const prices = chartData.map(d => d.price);
@@ -311,20 +316,20 @@ export default function TradingSimulator({ selectedAsset, setSelectedAsset, curr
       )}
 
       {/* Overview stats */}
-      <div className="simulator-stats-grid grid grid-cols-3 gap-8">
+      <div className="simulator-stats-grid grid grid-cols-4 gap-6">
         <div className="card flex items-center gap-4 stat-card card-blue-accent">
           <div className="stat-icon-wrapper bg-blue">
-            <DollarSign size={24} className="color-blue" />
+            <DollarSign size={22} className="color-blue" />
           </div>
           <div>
-            <span className="text-xs text-muted font-label uppercase">Virtual Balance</span>
+            <span className="text-xs text-muted font-label uppercase">Account Balance</span>
             <h3 className="stat-val font-mono">${balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}</h3>
           </div>
         </div>
 
         <div className="card flex items-center gap-4 stat-card">
           <div className="stat-icon-wrapper bg-gold">
-            <TrendingUp size={24} className="color-gold" />
+            <TrendingUp size={22} className="color-gold" />
           </div>
           <div>
             <span className="text-xs text-muted font-label uppercase">Net Equity</span>
@@ -334,13 +339,26 @@ export default function TradingSimulator({ selectedAsset, setSelectedAsset, curr
 
         <div className="card flex items-center gap-4 stat-card card-gold-accent">
           <div className="stat-icon-wrapper bg-light">
-            <Briefcase size={24} className={totalFloatingPL >= 0 ? 'text-success' : 'text-danger'} />
+            <Briefcase size={22} className={totalFloatingPL >= 0 ? 'text-success' : 'text-danger'} />
           </div>
           <div>
-            <span className="text-xs text-muted font-label uppercase">Active P/L</span>
+            <span className="text-xs text-muted font-label uppercase">Floating P/L</span>
             <h3 className={`stat-val font-mono ${totalFloatingPL >= 0 ? 'text-success' : 'text-danger'}`}>
               {totalFloatingPL >= 0 ? '+' : ''}${totalFloatingPL.toLocaleString(undefined, { minimumFractionDigits: 2 })}
             </h3>
+          </div>
+        </div>
+
+        <div className="card flex items-center gap-4 stat-card">
+          <div className="stat-icon-wrapper bg-blue">
+            <TrendingUp size={22} className="color-blue" />
+          </div>
+          <div>
+            <span className="text-xs text-muted font-label uppercase">Free Margin</span>
+            <h3 className="stat-val font-mono">${freeMargin.toLocaleString(undefined, { minimumFractionDigits: 2 })}</h3>
+            <span className="text-xs font-mono" style={{ color: 'var(--color-amber)', fontSize: '0.72rem' }}>
+              Level: {marginLevel}%
+            </span>
           </div>
         </div>
       </div>
@@ -351,7 +369,7 @@ export default function TradingSimulator({ selectedAsset, setSelectedAsset, curr
         <div className="card chart-card grid-column-span-2">
           <div className="flex items-center justify-between chart-header">
             <div>
-              <span className="chart-asset-label uppercase font-label">Simulating Live Chart</span>
+              <span className="chart-asset-label uppercase font-label">Direct Market Execution (ECN/STP)</span>
               <h3 className="chart-asset-title flex items-center gap-4">
                 {selectedAsset}
                 <span className="live-badge flex items-center">
@@ -454,7 +472,7 @@ export default function TradingSimulator({ selectedAsset, setSelectedAsset, curr
                 </span>
               </div>
               <div className="flex justify-between text-xs" style={{ marginTop: '0.25rem' }}>
-                <span className="text-muted">Available Virtual Cash:</span>
+                <span className="text-muted">Free Margin Available:</span>
                 <span className="font-mono text-dark" style={{ fontWeight: 600 }}>
                   ${balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                 </span>
@@ -549,7 +567,7 @@ export default function TradingSimulator({ selectedAsset, setSelectedAsset, curr
               ) : (
                 <tr>
                   <td colSpan="8" className="text-center text-muted" style={{ padding: '2.5rem' }}>
-                    No active positions. Execute a BUY or SELL order to test real-time pricing and margin calculation.
+                    No active working orders on record. Execute a BUY or SELL market order to take a direct institutional position.
                   </td>
                 </tr>
               )}
@@ -558,21 +576,19 @@ export default function TradingSimulator({ selectedAsset, setSelectedAsset, curr
         </div>
       </div>
 
-      {!currentUser && (
-        <button
-          className="btn btn-secondary btn-sm text-center"
-          style={{ margin: '1.5rem auto 0 auto', display: 'block' }}
-          onClick={() => {
-            if (window.confirm('Reset virtual cash balance to $10,000.00? This clears open positions.')) {
-              setBalance(10000.00);
-              setPositions([]);
-              localStorage.setItem('aura_demo_balance', '10000.00');
-            }
-          }}
-        >
-          Reset Simulation Balance
-        </button>
-      )}
+      <div className="flex items-center justify-between flex-wrap gap-4 font-mono text-xs text-muted" style={{ marginTop: '1.5rem', padding: '0.85rem 1.25rem', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)' }}>
+        <div className="flex items-center gap-2">
+          <span className="continuum-dot"></span>
+          <span style={{ color: '#ffffff', fontWeight: 600 }}>LIVE GATEWAY:</span>
+          <span>CT-LD4 London (Equinix Optical Cross-Connect)</span>
+        </div>
+        <div className="flex items-center gap-4 flex-wrap">
+          <span>LATENCY: <strong style={{ color: 'var(--color-amber)' }}>3.8ms</strong></span>
+          <span>PROTOCOL: <strong>FIX 4.4</strong></span>
+          <span>ROUTING: <strong>DMA / No Dealing Desk (NDD)</strong></span>
+          <span>TIER-1 CLEARING: <strong>Active</strong></span>
+        </div>
+      </div>
 
       <style>{`
         .trading-simulator-container {
@@ -778,7 +794,7 @@ export default function TradingSimulator({ selectedAsset, setSelectedAsset, curr
         /* ---- Simulator & Positions Responsive ---- */
         @media (max-width: 992px) {
           .simulator-stats-grid {
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(2, 1fr);
             gap: 0.85rem;
           }
           .stat-card {

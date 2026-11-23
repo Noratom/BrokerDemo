@@ -59,12 +59,25 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
         onAuthSuccess(mockUser);
       } else {
         // Mock admin check
-        if (formData.email === 'admin@auratrade.com' && formData.password === 'admin123') {
-          onAuthSuccess({ id: 'user_admin', name: 'System Admin', email: formData.email, balance: 0.0, role: 'admin' });
-        } else if (formData.email === 'client@auratrade.com' && formData.password === 'client123') {
-          onAuthSuccess({ id: 'user_1', name: 'Demo Client', email: formData.email, balance: 15000.00, role: 'client' });
+        const normEmail = formData.email.toLowerCase();
+        if ((normEmail === 'admin@continuum-trading.com' || normEmail === 'admin@auratrade.com') && formData.password === 'admin123') {
+          onAuthSuccess({ id: 'user_admin', name: 'Chief Compliance Officer', email: formData.email, balance: 0.0, role: 'admin' });
+        } else if ((normEmail === 'client@continuum-trading.com' || normEmail === 'client@auratrade.com') && formData.password === 'client123') {
+          onAuthSuccess({ 
+            id: 'user_1', 
+            name: 'Alexander Wright', 
+            email: formData.email, 
+            balance: 15000.00, 
+            role: 'client',
+            accountNumber: 'CT-892104-LIVE',
+            accountType: 'Institutional Raw ECN',
+            leverage: '1:100',
+            currency: 'USD',
+            server: 'CT-LD4 London',
+            kycStatus: 'verified'
+          });
         } else {
-          setError('Invalid login details. Try admin@auratrade.com (admin123) or client@auratrade.com (client123)');
+          setError('Invalid login credentials. Try client@continuum-trading.com / client123');
           setLoading(false);
           return;
         }
@@ -80,7 +93,7 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
       <div className="auth-modal card card-blue-accent">
         {/* Header */}
         <div className="auth-header flex justify-between items-center">
-          <h3 className="auth-title">{isRegister ? 'Register Trading Profile' : 'Log In Client Portal'}</h3>
+          <h3 className="auth-title">{isRegister ? 'Open Live Brokerage Account' : 'Client Portal Login'}</h3>
           <button className="auth-close" onClick={onClose}><X size={20} /></button>
         </div>
 
@@ -118,7 +131,7 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
                 type="email"
                 name="email"
                 required
-                placeholder="client@auratrade.com"
+                placeholder="client@continuum-trading.com"
                 className="form-input with-icon"
                 value={formData.email}
                 onChange={handleInputChange}
@@ -145,7 +158,7 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
           {isRegister && (
             <div className="form-group">
               <label className="form-label flex justify-between">
-                <span>Initial Virtual Deposit</span>
+                <span>Initial Account Capital / Equity Base</span>
                 <span className="font-mono text-gold" style={{ fontWeight: 700 }}>
                   ${Number(formData.startingBalance).toLocaleString()}
                 </span>
@@ -164,7 +177,7 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
                 />
               </div>
               <span className="text-xxs text-muted" style={{ fontSize: '0.7rem' }}>
-                Select virtual capital from $500 to $100,000 for training.
+                Select initial account capital from $500 to $100,000 for equity allocation.
               </span>
             </div>
           )}
@@ -175,7 +188,7 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
             style={{ width: '100%', marginTop: '1.25rem' }}
             disabled={loading}
           >
-            {loading ? 'Processing...' : (isRegister ? 'Create Account' : 'Secure Login')}
+            {loading ? 'Authorizing...' : (isRegister ? 'Open Live Account' : 'Secure Client Sign In')}
           </button>
         </form>
 
@@ -190,7 +203,7 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
           >
             {isRegister 
               ? 'Already registered? Click here to sign in' 
-              : "New to AuraTrade? Click here to register a demo profile"}
+              : "New to Continuum Trading? Open a Live Brokerage Account"}
           </button>
           
           <div className="flex items-center justify-center gap-2 text-xxs text-muted" style={{ marginTop: '1rem', fontSize: '0.7rem', opacity: 0.8 }}>

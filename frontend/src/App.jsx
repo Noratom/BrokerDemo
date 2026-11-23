@@ -16,7 +16,7 @@ function App() {
   const [activePage, setActivePage] = useState('home');
   const [selectedAsset, setSelectedAsset] = useState('EUR/USD');
   const [currentUser, setCurrentUser] = useState(() => {
-    const saved = localStorage.getItem('aura_current_user');
+    const saved = localStorage.getItem('ct_current_user');
     return saved ? JSON.parse(saved) : null;
   });
   const [fundingModal, setFundingModal] = useState({ isOpen: false, tab: 'deposit', amount: '' });
@@ -29,7 +29,7 @@ function App() {
     if (currentUser) {
       setCurrentUser(prev => {
         const updated = { ...prev, balance: newBalance };
-        localStorage.setItem('aura_current_user', JSON.stringify(updated));
+        localStorage.setItem('ct_current_user', JSON.stringify(updated));
         return updated;
       });
     }
@@ -46,7 +46,7 @@ function App() {
           const result = await response.json();
           setCurrentUser(prev => {
             const updated = { ...prev, balance: result.data.balance };
-            localStorage.setItem('aura_current_user', JSON.stringify(updated));
+            localStorage.setItem('ct_current_user', JSON.stringify(updated));
             return updated;
           });
         }
@@ -75,7 +75,7 @@ function App() {
 
   const handleAuthSuccess = (userData) => {
     setCurrentUser(userData);
-    localStorage.setItem('aura_current_user', JSON.stringify(userData));
+    localStorage.setItem('ct_current_user', JSON.stringify(userData));
     if (userData.role === 'admin') {
       setActivePage('admin');
     } else {
@@ -85,7 +85,7 @@ function App() {
 
   const handleLogout = () => {
     setCurrentUser(null);
-    localStorage.removeItem('aura_current_user');
+    localStorage.removeItem('ct_current_user');
     setActivePage('home');
   };
 

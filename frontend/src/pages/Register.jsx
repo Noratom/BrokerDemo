@@ -63,16 +63,16 @@ export default function Register({ onAuthSuccess, onSwitchToLogin }) {
           <div className="auth-brand-content">
             <div className="flex items-center gap-3" style={{ marginBottom: '2.5rem' }}>
               <TrendingUp size={32} />
-              <span className="auth-logo-text">AURA<span className="gold-shimmer">TRADE</span></span>
+              <span className="auth-logo-text">CONTINUUM<span className="gold-shimmer"> TRADING</span></span>
             </div>
             <h1 className="auth-brand-title">Start Your Trading Journey</h1>
             <p className="auth-brand-desc">
-              Join thousands of traders worldwide. Set up your virtual portfolio in under 60 seconds with no commitments.
+              Join institutional and private clients worldwide. Set up your live trading account in under 60 seconds with instant compliance verification.
             </p>
 
             {/* Live deposit preview */}
             <div className="register-preview-card">
-              <div className="preview-label">Your Account Preview</div>
+              <div className="preview-label">Your Live Account Preview</div>
               <div className="preview-balance">
                 <Sparkles size={20} className="text-gold" />
                 <span className="font-mono" style={{ fontSize: '1.8rem', fontWeight: 800 }}>
@@ -165,7 +165,7 @@ export default function Register({ onAuthSuccess, onSwitchToLogin }) {
               </div>
 
               <button type="submit" className="btn btn-gold btn-lg w-full" disabled={loading}>
-                {loading ? 'Creating...' : 'Open Demo Account'}
+                {loading ? 'Authorizing Account...' : 'Open Live Brokerage Account'}
                 {!loading && <ArrowRight size={18} />}
               </button>
             </form>

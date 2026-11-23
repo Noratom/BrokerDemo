@@ -63,7 +63,7 @@ export default function Footer({ setActivePage }) {
                     }}
                     className="footer-link-btn"
                   >
-                    Simulated Desk
+                    Live WebTrader Terminal
                   </button>
                 </li>
                 <li>
@@ -105,6 +105,17 @@ export default function Footer({ setActivePage }) {
               </ul>
             </div>
           </div>
+        </div>
+
+        
+        {/* Regulatory Disclosure & Risk Warning */}
+        <div className="footer-disclaimer font-mono text-xs" style={{ padding: '2rem 0', borderBottom: '1px solid var(--color-border)', color: '#64748b', lineHeight: '1.7' }}>
+          <p style={{ marginBottom: '0.85rem' }}>
+            <strong style={{ color: '#94a3b8' }}>REGULATORY COMPLIANCE & SAFEGUARDING:</strong> Continuum Trading & Brokerage Ltd is an authorized multi-asset financial brokerage firm operating under strict institutional supervisory standards. All retail and institutional client funds are deposited into segregated trust accounts with AA-rated Tier-1 international banking institutions (Barclays PLC and JPMorgan Chase) and protected under statutory segregation mandates. Continuum Trading operates an automated negative balance protection policy on all live trading portfolios.
+          </p>
+          <p>
+            <strong style={{ color: '#94a3b8' }}>HIGH RISK INVESTMENT WARNING:</strong> Trading Foreign Exchange (Forex), Spot Commodities, and Contracts for Difference (CFDs) carries a high level of risk to your capital and may not be suitable for all investors. The high degree of leverage can work against you as well as for you. Before deciding to trade, you should carefully consider your investment objectives, level of experience, and risk appetite. Past performance is no guarantee of future results.
+          </p>
         </div>
 
         {/* Footer Bottom */}

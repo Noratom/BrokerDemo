@@ -90,19 +90,19 @@ export default function DepositWithdrawModal({ isOpen, onClose, initialTab = 'de
   };
 
   const fallbackLocalDeposit = (numAmount, transaction) => {
-    const saved = localStorage.getItem('aura_transactions');
+    const saved = localStorage.getItem('ct_transactions');
     const list = saved ? JSON.parse(saved) : [];
     list.unshift(transaction);
-    localStorage.setItem('aura_transactions', JSON.stringify(list));
+    localStorage.setItem('ct_transactions', JSON.stringify(list));
 
     if (currentUser) {
       currentUser.balance = (currentUser.balance || 0) + numAmount;
-      localStorage.setItem('aura_current_user', JSON.stringify(currentUser));
+      localStorage.setItem('ct_current_user', JSON.stringify(currentUser));
       if (onBalanceUpdate) onBalanceUpdate(currentUser.balance);
     } else {
-      const cur = parseFloat(localStorage.getItem('aura_demo_balance') || '10000');
+      const cur = parseFloat(localStorage.getItem('ct_live_balance') || '10000');
       const updated = cur + numAmount;
-      localStorage.setItem('aura_demo_balance', updated.toFixed(2));
+      localStorage.setItem('ct_live_balance', updated.toFixed(2));
       if (onBalanceUpdate) onBalanceUpdate(updated);
     }
   };
@@ -182,19 +182,19 @@ export default function DepositWithdrawModal({ isOpen, onClose, initialTab = 'de
   };
 
   const fallbackLocalWithdraw = (numAmount, transaction) => {
-    const saved = localStorage.getItem('aura_transactions');
+    const saved = localStorage.getItem('ct_transactions');
     const list = saved ? JSON.parse(saved) : [];
     list.unshift(transaction);
-    localStorage.setItem('aura_transactions', JSON.stringify(list));
+    localStorage.setItem('ct_transactions', JSON.stringify(list));
 
     if (currentUser) {
       currentUser.balance = Math.max(0, (currentUser.balance || 0) - numAmount);
-      localStorage.setItem('aura_current_user', JSON.stringify(currentUser));
+      localStorage.setItem('ct_current_user', JSON.stringify(currentUser));
       if (onBalanceUpdate) onBalanceUpdate(currentUser.balance);
     } else {
-      const cur = parseFloat(localStorage.getItem('aura_demo_balance') || '10000');
+      const cur = parseFloat(localStorage.getItem('ct_live_balance') || '10000');
       const updated = Math.max(0, cur - numAmount);
-      localStorage.setItem('aura_demo_balance', updated.toFixed(2));
+      localStorage.setItem('ct_live_balance', updated.toFixed(2));
       if (onBalanceUpdate) onBalanceUpdate(updated);
     }
   };

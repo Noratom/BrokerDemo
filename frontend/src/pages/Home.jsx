@@ -364,16 +364,16 @@ export default function Home({ selectedAsset, setSelectedAsset, currentUser, onO
       <section id="trading-desk" className="section section-bg-blue animate-on-scroll">
         <div className="container flex flex-col gap-8">
           <div className="text-center">
-            <span className="section-label">SIMULATED EXECUTION</span>
-            <h2>Continuum Trading Desk</h2>
+            <span className="section-label">INSTITUTIONAL EXECUTION</span>
+            <h2>Continuum WebTrader & Market Execution</h2>
             <p className="text-muted" style={{ marginTop: '0.5rem', maxWidth: '600px', margin: '0.5rem auto 0' }}>
-              Practice positioning orders using real-time market telemetry and virtual margin. Test raw spreads before committing live capital.
+              Direct market access terminal routing orders through Tier-1 interbank liquidity providers. Zero dealing desk intervention with ultra-low latency execution.
             </p>
             {!currentUser && (
               <div className="login-warning-box flex items-center gap-3 justify-center" style={{ marginTop: '1rem' }}>
                 <Sparkles size={15} style={{ color: 'var(--color-amber)' }} />
                 <span className="text-xs">
-                  Simulating as Guest. <button onClick={onOpenAuth} className="underline-btn">Sign in</button> to preserve balances and record trade audits.
+                  Direct Market Terminal Preview. <button onClick={onOpenAuth} className="underline-btn">Sign in to Live Account</button> to manage authorized equity and execute institutional orders.
                 </span>
               </div>
             )}

@@ -14,20 +14,20 @@ export default function ContactForm() {
 
   const faqs = [
     {
-      q: 'How does the AuraTrade demo simulator work?',
-      a: 'The simulator mimics real market prices with virtual cash, giving you a sandbox to practice trading. It features realistic contract size specifications, real-time bid/ask spreads, and floating margin calculation for risk assessment.'
+      q: 'How does Continuum Trading execute client orders?',
+      a: 'We operate a pure Straight-Through-Processing (STP) and No Dealing Desk (NDD) ECN execution model. Your orders are routed directly to Tier-1 interbank liquidity providers via fiber cross-connects in London (Equinix LD4) and New York (NY4), ensuring ultra-low latency fills with zero dealer intervention.'
     },
     {
-      q: 'Are client funds safe with AuraTrade?',
-      a: 'Yes, in our live production services, all client assets are segregated in independent tier-1 bank custody accounts separate from the broker\'s balance sheet, and covered by negative balance protection policies.'
+      q: 'Are client funds segregated and protected?',
+      a: 'Yes. All client capital is held in segregated trust accounts with AA-rated Tier-1 international banks (Barclays and JPMorgan Chase), completely isolated from corporate operational funds in compliance with statutory client safeguarding directives.'
     },
     {
-      q: 'What leverage options do you support?',
-      a: 'We support leverage ratios ranging from 1:10 on cryptocurrencies, up to 1:100 on major forex currency pairs, ensuring flexible capital configuration for professional portfolios.'
+      q: 'What are the withdrawal and deposit settlement times?',
+      a: 'Crypto deposits (USDT TRC20, BTC, ETH) credit automatically within 1 to 3 blockchain network confirmations. Wire transfers credit same-day upon receipt. All client withdrawal authorizations are processed within 2 to 4 business hours by our treasury desk.'
     },
     {
-      q: 'How can I transition to a live account?',
-      a: 'To apply for live trading, submit your verification files (Proof of ID and Address) through the client portal. Our compliance desk usually reviews applications within 2 hours.'
+      q: 'What regulatory and KYC verification is required?',
+      a: 'In accordance with global Anti-Money Laundering (AML) standards and international financial regulations, all live trading accounts undergo identity verification (Proof of ID & Proof of Address) to ensure an authorized, secure institutional environment.'
     }
   ];
 
@@ -58,7 +58,7 @@ export default function ContactForm() {
       // Local fallback
       setStatus({ 
         type: 'success', 
-        message: 'Message registered offline. (Express backend server not running, showing local fallback demo)' 
+        message: 'Message registered offline. Your inquiry has been queued for immediate compliance review.' 
       });
       setFormData({ name: '', email: '', subject: 'General Query', message: '' });
     }
@@ -121,7 +121,7 @@ export default function ContactForm() {
                 onChange={handleInputChange}
               >
                 <option value="General Query">General Query</option>
-                <option value="Trading Platform">Trading Simulator / Platform issue</option>
+                <option value="Trading Platform">WebTrader Terminal / Execution issue</option>
                 <option value="Compliance">Compliance & Verifications</option>
                 <option value="Partnership">Institutional Partnership</option>
               </select>

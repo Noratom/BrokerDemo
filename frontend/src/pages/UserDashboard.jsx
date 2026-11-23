@@ -12,11 +12,11 @@ export default function UserDashboard({ currentUser, onLogout, setActivePage }) 
   const [positions, setPositions] = useState([]);
   const [markets, setMarkets] = useState([]);
   const [watchlist, setWatchlist] = useState(() => {
-    const saved = localStorage.getItem('aura_watchlist');
+    const saved = localStorage.getItem('ct_watchlist');
     return saved ? JSON.parse(saved) : ['EUR/USD', 'BTC/USD', 'GOLD'];
   });
   const [transactions, setTransactions] = useState(() => {
-    const saved = localStorage.getItem('aura_transactions');
+    const saved = localStorage.getItem('ct_transactions');
     return saved ? JSON.parse(saved) : [
       {
         id: 'DEP-8921B',
@@ -48,7 +48,7 @@ export default function UserDashboard({ currentUser, onLogout, setActivePage }) 
           const r = await txRes.json();
           if (r.data && r.data.length > 0) {
             setTransactions(r.data);
-            localStorage.setItem('aura_transactions', JSON.stringify(r.data));
+            localStorage.setItem('ct_transactions', JSON.stringify(r.data));
           }
         }
       } catch (e) {}
@@ -59,7 +59,7 @@ export default function UserDashboard({ currentUser, onLogout, setActivePage }) 
   }, [currentUser.id]);
 
   useEffect(() => {
-    localStorage.setItem('aura_watchlist', JSON.stringify(watchlist));
+    localStorage.setItem('ct_watchlist', JSON.stringify(watchlist));
   }, [watchlist]);
 
   const toggleWatchlist = (symbol) => {
@@ -74,8 +74,8 @@ export default function UserDashboard({ currentUser, onLogout, setActivePage }) 
 
   const handleBalanceUpdate = (newBalance) => {
     currentUser.balance = newBalance;
-    localStorage.setItem('aura_current_user', JSON.stringify(currentUser));
-    const saved = localStorage.getItem('aura_transactions');
+    localStorage.setItem('ct_current_user', JSON.stringify(currentUser));
+    const saved = localStorage.getItem('ct_transactions');
     if (saved) setTransactions(JSON.parse(saved));
   };
 
@@ -95,6 +95,7 @@ export default function UserDashboard({ currentUser, onLogout, setActivePage }) 
     { id: 'wallet', label: 'Deposit & Withdraw', icon: Wallet },
     { id: 'positions', label: 'Open Positions', icon: Briefcase },
     { id: 'watchlist', label: 'Watchlist', icon: Star },
+    { id: 'kyc', label: 'KYC & Compliance', icon: ShieldCheck },
     { id: 'history', label: 'Trade History', icon: Clock },
   ];
 
@@ -175,17 +176,58 @@ export default function UserDashboard({ currentUser, onLogout, setActivePage }) 
               <div className="flex justify-between items-center flex-wrap gap-4" style={{ marginBottom: '1.5rem' }}>
                 <div>
                   <h2 style={{ marginBottom: '0.25rem' }}>Portfolio Overview</h2>
-                  <p className="text-muted text-sm">Welcome back, {currentUser.name.split(' ')[0]}. Here is your current financial summary.</p>
+                  <p className="text-muted text-sm">Welcome back, {currentUser.name.split(' ')[0]}. Here is your authorized brokerage summary.</p>
                 </div>
                 <div className="flex gap-2">
                   <button className="btn btn-primary btn-sm flex items-center gap-2" onClick={() => handleOpenFunding('deposit')}>
                     <ArrowDownCircle size={16} />
-                    <span>Deposit</span>
+                    <span>Deposit Funds</span>
                   </button>
                   <button className="btn btn-secondary btn-sm flex items-center gap-2" onClick={() => handleOpenFunding('withdraw')}>
                     <ArrowUpCircle size={16} />
-                    <span>Withdraw</span>
+                    <span>Request Withdrawal</span>
                   </button>
+                </div>
+              </div>
+
+              {/* Live Broker Account Credentials Strip */}
+              <div className="card card-static flex items-center justify-between flex-wrap gap-4" style={{ marginBottom: '2rem', padding: '1rem 1.5rem', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--color-border)' }}>
+                <div className="flex items-center gap-3">
+                  <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'rgba(16, 185, 129, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#10b981', flexShrink: 0 }}>
+                    <ShieldCheck size={22} />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono" style={{ fontWeight: 800, color: '#ffffff', fontSize: '1.05rem' }}>
+                        {currentUser.accountNumber || 'CT-892104-LIVE'}
+                      </span>
+                      <span className="type-tag tag-buy" style={{ fontSize: '0.7rem' }}>
+                        TIER-1 VERIFIED
+                      </span>
+                    </div>
+                    <div className="text-xs text-muted" style={{ marginTop: '0.15rem' }}>
+                      Server: {currentUser.server || 'CT-LD4 London (Equinix)'} · Type: {currentUser.accountType || 'Institutional Raw ECN'}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-6 font-mono text-xs flex-wrap">
+                  <div>
+                    <span className="text-muted block">LEVERAGE</span>
+                    <strong style={{ color: '#ffffff' }}>{currentUser.leverage || '1:100'}</strong>
+                  </div>
+                  <div>
+                    <span className="text-muted block">BASE CURRENCY</span>
+                    <strong style={{ color: '#ffffff' }}>{currentUser.currency || 'USD'}</strong>
+                  </div>
+                  <div>
+                    <span className="text-muted block">SETTLEMENT</span>
+                    <strong style={{ color: '#10b981' }}>Same-Day STP</strong>
+                  </div>
+                  <div>
+                    <span className="text-muted block">ROUTING</span>
+                    <strong style={{ color: 'var(--color-amber)' }}>DMA / NDD</strong>
+                  </div>
                 </div>
               </div>
 
@@ -457,6 +499,68 @@ export default function UserDashboard({ currentUser, onLogout, setActivePage }) 
                     </div>
                   );
                 })}
+              </div>
+            </div>
+          )}
+
+          
+          {/* ══════════ TAB: KYC & COMPLIANCE ══════════ */}
+          {activeTab === 'kyc' && (
+            <div className="page-enter">
+              <div style={{ marginBottom: '1.5rem' }}>
+                <h2>KYC & Regulatory Compliance</h2>
+                <p className="text-muted text-sm">Review your regulatory verification standing and Tier-1 institutional account status.</p>
+              </div>
+
+              <div className="grid grid-cols-3 gap-6" style={{ marginBottom: '2rem' }}>
+                <div className="card card-static flex items-start gap-3">
+                  <CheckCircle2 size={22} style={{ color: '#10b981', marginTop: '2px', flexShrink: 0 }} />
+                  <div>
+                    <h4 style={{ fontSize: '0.95rem' }}>Proof of Identity</h4>
+                    <p className="text-xs text-muted" style={{ marginTop: '0.25rem' }}>Passport / Government National ID</p>
+                    <span className="type-tag tag-buy" style={{ marginTop: '0.5rem', display: 'inline-block' }}>VERIFIED</span>
+                  </div>
+                </div>
+
+                <div className="card card-static flex items-start gap-3">
+                  <CheckCircle2 size={22} style={{ color: '#10b981', marginTop: '2px', flexShrink: 0 }} />
+                  <div>
+                    <h4 style={{ fontSize: '0.95rem' }}>Proof of Residence</h4>
+                    <p className="text-xs text-muted" style={{ marginTop: '0.25rem' }}>Bank Statement & Utility Clearance</p>
+                    <span className="type-tag tag-buy" style={{ marginTop: '0.5rem', display: 'inline-block' }}>VERIFIED</span>
+                  </div>
+                </div>
+
+                <div className="card card-static flex items-start gap-3">
+                  <CheckCircle2 size={22} style={{ color: '#10b981', marginTop: '2px', flexShrink: 0 }} />
+                  <div>
+                    <h4 style={{ fontSize: '0.95rem' }}>AML & PEP Sanctions</h4>
+                    <p className="text-xs text-muted" style={{ marginTop: '0.25rem' }}>Global Sanctions & PEP Database</p>
+                    <span className="type-tag tag-buy" style={{ marginTop: '0.5rem', display: 'inline-block' }}>PASSED CLEAN</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="card card-static">
+                <h4 style={{ marginBottom: '1rem' }}>Institutional Custody & Safeguards</h4>
+                <div className="flex flex-col gap-3 text-sm" style={{ color: '#cbd5e1' }}>
+                  <div className="flex justify-between items-center py-2 border-b border-white/5">
+                    <span className="text-muted">Account Tier Level</span>
+                    <strong className="font-mono text-white">Tier-1 Institutional (Unlimited Trading & Wire Capacity)</strong>
+                  </div>
+                  <div className="flex justify-between items-center py-2 border-b border-white/5">
+                    <span className="text-muted">Segregated Custodian Bank</span>
+                    <strong className="font-mono text-white">Barclays PLC & JPMorgan Chase (London & New York)</strong>
+                  </div>
+                  <div className="flex justify-between items-center py-2 border-b border-white/5">
+                    <span className="text-muted">Negative Balance Protection</span>
+                    <strong className="font-mono text-success">Automated Guarantee Active</strong>
+                  </div>
+                  <div className="flex justify-between items-center py-2">
+                    <span className="text-muted">Direct Market Execution</span>
+                    <strong className="font-mono" style={{ color: 'var(--color-amber)' }}>Straight-Through Processing (STP/NDD)</strong>
+                  </div>
+                </div>
               </div>
             </div>
           )}

@@ -13,13 +13,33 @@ app.use(cors());
 app.use(express.json());
 
 app.get('/', (req, res) => {
-  res.json({ status: 'success', message: 'AuraTrade API Server is running!' });
+  res.json({ status: 'success', message: 'Continuum Trading Institutional Broker API Server is running!' });
 });
 
 // In-memory Mock Database
 let users = [
-  { id: 'user_1', name: 'Demo Client', email: 'client@auratrade.com', password: 'client123', balance: 15000.00, role: 'client' },
-  { id: 'user_admin', name: 'System Admin', email: 'admin@auratrade.com', password: 'admin123', balance: 0.00, role: 'admin' }
+  { 
+    id: 'user_1', 
+    name: 'Alexander Wright', 
+    email: 'client@continuum-trading.com', 
+    password: 'client123', 
+    balance: 15000.00, 
+    role: 'client',
+    accountNumber: 'CT-892104-LIVE',
+    accountType: 'Institutional Raw ECN',
+    leverage: '1:100',
+    currency: 'USD',
+    server: 'CT-LD4 London',
+    kycStatus: 'verified'
+  },
+  { 
+    id: 'user_admin', 
+    name: 'Chief Compliance Officer', 
+    email: 'admin@continuum-trading.com', 
+    password: 'admin123', 
+    balance: 0.00, 
+    role: 'admin' 
+  }
 ];
 
 let markets = [
@@ -110,14 +130,27 @@ app.post('/api/auth/login', (req, res) => {
     return res.status(400).json({ status: 'error', message: 'Email and password required.' });
   }
 
-  const user = users.find(u => u.email.toLowerCase() === email.toLowerCase() && u.password === password);
+  const normalizedEmail = email.toLowerCase().replace('@auratrade.com', '@continuum-trading.com');
+  const user = users.find(u => (u.email.toLowerCase() === normalizedEmail || u.email.toLowerCase() === email.toLowerCase()) && u.password === password);
   if (!user) {
     return res.status(401).json({ status: 'error', message: 'Invalid credentials. Please try again.' });
   }
 
   res.json({
     status: 'success',
-    data: { id: user.id, name: user.name, email: user.email, balance: user.balance, role: user.role }
+    data: { 
+      id: user.id, 
+      name: user.name, 
+      email: user.email, 
+      balance: user.balance, 
+      role: user.role,
+      accountNumber: user.accountNumber || 'CT-892104-LIVE',
+      accountType: user.accountType || 'Institutional Raw ECN',
+      leverage: user.leverage || '1:100',
+      currency: user.currency || 'USD',
+      server: user.server || 'CT-LD4 London',
+      kycStatus: user.kycStatus || 'verified'
+    }
   });
 });
 
@@ -506,5 +539,5 @@ app.post('/api/admin/markets/override', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`AuraTrade Mock Broker API Server running on port ${PORT}`);
+  console.log(`Continuum Trading Institutional Broker API Server running on port ${PORT}`);
 });

@@ -27,12 +27,25 @@ export default function Login({ onAuthSuccess, onSwitchToRegister }) {
         setError(result.message || 'Invalid credentials.');
       }
     } catch (err) {
-      if (email === 'admin@auratrade.com' && password === 'admin123') {
-        onAuthSuccess({ id: 'user_admin', name: 'System Admin', email, balance: 0, role: 'admin' });
-      } else if (email === 'client@auratrade.com' && password === 'client123') {
-        onAuthSuccess({ id: 'user_1', name: 'Demo Client', email, balance: 15000, role: 'client' });
+      const norm = email.toLowerCase();
+      if ((norm === 'admin@continuum-trading.com' || norm === 'admin@auratrade.com') && password === 'admin123') {
+        onAuthSuccess({ id: 'user_admin', name: 'Chief Compliance Officer', email, balance: 0, role: 'admin' });
+      } else if ((norm === 'client@continuum-trading.com' || norm === 'client@auratrade.com') && password === 'client123') {
+        onAuthSuccess({ 
+          id: 'user_1', 
+          name: 'Alexander Wright', 
+          email, 
+          balance: 15000, 
+          role: 'client',
+          accountNumber: 'CT-892104-LIVE',
+          accountType: 'Institutional Raw ECN',
+          leverage: '1:100',
+          currency: 'USD',
+          server: 'CT-LD4 London',
+          kycStatus: 'verified'
+        });
       } else {
-        setError('Server offline. Try admin@auratrade.com / admin123');
+        setError('Invalid credentials. Try client@continuum-trading.com / client123');
       }
     } finally {
       setLoading(false);
@@ -47,7 +60,7 @@ export default function Login({ onAuthSuccess, onSwitchToRegister }) {
           <div className="auth-brand-content">
             <div className="flex items-center gap-3" style={{ marginBottom: '2.5rem' }}>
               <TrendingUp size={32} />
-              <span className="auth-logo-text">AURA<span className="gold-shimmer">TRADE</span></span>
+              <span className="auth-logo-text">CONTINUUM<span className="gold-shimmer"> TRADING</span></span>
             </div>
             <h1 className="auth-brand-title">Welcome Back</h1>
             <p className="auth-brand-desc">
@@ -128,14 +141,14 @@ export default function Login({ onAuthSuccess, onSwitchToRegister }) {
             <div className="auth-switch">
               <span className="text-muted text-sm">Don't have an account?</span>
               <button onClick={onSwitchToRegister} className="auth-switch-btn">
-                Create a free account
+                Open an official account
               </button>
             </div>
 
-            <div className="auth-demo-hint">
-              <p className="text-xs text-muted">Demo credentials:</p>
-              <code className="text-xs">admin@auratrade.com / admin123</code>
-              <code className="text-xs">client@auratrade.com / client123</code>
+            <div className="auth-portal-hint">
+              <p className="text-xs text-muted">Portal Credentials:</p>
+              <code className="text-xs">client@continuum-trading.com / client123</code>
+              <code className="text-xs">admin@continuum-trading.com / admin123</code>
             </div>
           </div>
         </div>
@@ -305,7 +318,7 @@ export default function Login({ onAuthSuccess, onSwitchToRegister }) {
           font-size: 0.9rem;
         }
         .auth-switch-btn:hover { text-decoration: underline; }
-        .auth-demo-hint {
+        .auth-portal-hint {
           margin-top: 1.5rem;
           padding: 0.75rem;
           background-color: var(--color-blue-mist);
@@ -314,7 +327,7 @@ export default function Login({ onAuthSuccess, onSwitchToRegister }) {
           flex-direction: column;
           gap: 0.25rem;
         }
-        .auth-demo-hint code {
+        .auth-portal-hint code {
           font-family: monospace;
           color: var(--color-blue-royal);
         }
