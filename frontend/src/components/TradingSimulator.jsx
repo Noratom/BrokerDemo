@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
+import TradingViewChart from './TradingViewChart';
+import { CandlestickChart, LineChart as LineChartIcon, Shield, Target } from 'lucide-react';
 import { ArrowUpRight, ArrowDownRight, Briefcase, TrendingUp, DollarSign, X, ShieldAlert, CheckCircle, UserPlus } from 'lucide-react';
 import { API_BASE_URL } from '../config';
 
@@ -13,6 +15,9 @@ export default function TradingSimulator({ selectedAsset, setSelectedAsset, curr
   const [currentMarketPrice, setCurrentMarketPrice] = useState(1.0854);
   const [spread, setSpread] = useState(0.0001);
   const [notification, setNotification] = useState(null);
+  const [chartType, setChartType] = useState('candlestick'); // 'candlestick' | 'radar'
+  const [stopLoss, setStopLoss] = useState('');
+  const [takeProfit, setTakeProfit] = useState('');
   const chartContainerRef = useRef(null);
 
   // Sync balance from currentUser if logged in
@@ -181,6 +186,8 @@ export default function TradingSimulator({ selectedAsset, setSelectedAsset, curr
         size: Number(tradeSize),
         entryPrice: currentMarketPrice,
         currentPrice: currentMarketPrice,
+        stopLoss: stopLoss ? parseFloat(stopLoss) : null,
+        takeProfit: takeProfit ? parseFloat(takeProfit) : null,
         timestamp: new Date().toISOString()
       };
       setPositions(prev => [...prev, newPos]);
@@ -367,9 +374,31 @@ export default function TradingSimulator({ selectedAsset, setSelectedAsset, curr
       <div className="simulator-body grid grid-cols-3 gap-8" style={{ marginTop: '2rem' }}>
         {/* Chart View */}
         <div className="card chart-card grid-column-span-2">
-          <div className="flex items-center justify-between chart-header">
+          <div className="flex items-center justify-between chart-header flex-wrap gap-4">
             <div>
-              <span className="chart-asset-label uppercase font-label">Direct Market Execution (ECN/STP)</span>
+              <div className="flex items-center gap-3">
+                <span className="chart-asset-label uppercase font-label">Direct Market Execution (ECN/STP)</span>
+                <div className="chart-toggle-group flex items-center">
+                  <button 
+                    type="button" 
+                    className={`chart-mode-pill font-mono ${chartType === 'candlestick' ? 'active' : ''}`}
+                    onClick={() => setChartType('candlestick')}
+                    title="TradingView Pro Candlestick Chart"
+                  >
+                    <CandlestickChart size={13} />
+                    <span>TradingView</span>
+                  </button>
+                  <button 
+                    type="button" 
+                    className={`chart-mode-pill font-mono ${chartType === 'radar' ? 'active' : ''}`}
+                    onClick={() => setChartType('radar')}
+                    title="Continuum High-Speed Execution Depth"
+                  >
+                    <LineChartIcon size={13} />
+                    <span>Radar Depth</span>
+                  </button>
+                </div>
+              </div>
               <h3 className="chart-asset-title flex items-center gap-4">
                 {selectedAsset}
                 <span className="live-badge flex items-center">
@@ -382,45 +411,52 @@ export default function TradingSimulator({ selectedAsset, setSelectedAsset, curr
             </div>
           </div>
 
-          <div className="svg-chart-container" ref={chartContainerRef}>
-            {chartData.length > 0 ? (
-              <svg viewBox={`0 0 ${width} ${height}`} className="svg-chart">
-                <line x1={padding} y1={height - padding} x2={width - padding} y2={height - padding} stroke="var(--color-border-light)" strokeWidth={1} />
-                <line x1={padding} y1={padding} x2={padding} y2={height - padding} stroke="var(--color-border-light)" strokeWidth={1} />
-                <line x1={padding} y1={height / 2} x2={width - padding} y2={height / 2} stroke="var(--color-border-light)" strokeDasharray="5,5" strokeWidth={1} />
-                <line x1={width / 2} y1={padding} x2={width / 2} y2={height - padding} stroke="var(--color-border-light)" strokeDasharray="5,5" strokeWidth={1} />
+          {/* Chart Rendering Mode */}
+          {chartType === 'candlestick' ? (
+            <div className="tradingview-embed-box">
+              <TradingViewChart selectedAsset={selectedAsset} />
+            </div>
+          ) : (
+            <div className="svg-chart-container" ref={chartContainerRef}>
+              {chartData.length > 0 ? (
+                <svg viewBox={`0 0 ${width} ${height}`} className="svg-chart">
+                  <line x1={padding} y1={height - padding} x2={width - padding} y2={height - padding} stroke="var(--color-border-light)" strokeWidth={1} />
+                  <line x1={padding} y1={padding} x2={padding} y2={height - padding} stroke="var(--color-border-light)" strokeWidth={1} />
+                  <line x1={padding} y1={height / 2} x2={width - padding} y2={height / 2} stroke="var(--color-border-light)" strokeDasharray="5,5" strokeWidth={1} />
+                  <line x1={width / 2} y1={padding} x2={width / 2} y2={height - padding} stroke="var(--color-border-light)" strokeDasharray="5,5" strokeWidth={1} />
 
-                <defs>
-                  <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#f5a623" stopOpacity="0.15" />
-                    <stop offset="100%" stopColor="#f5a623" stopOpacity="0.0" />
-                  </linearGradient>
-                </defs>
-                <polygon points={areaPoints} fill="url(#chartGradient)" />
-                <polyline fill="none" stroke="#f5a623" strokeWidth={2.5} points={points} />
+                  <defs>
+                    <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#f5a623" stopOpacity="0.15" />
+                      <stop offset="100%" stopColor="#f5a623" stopOpacity="0.0" />
+                    </linearGradient>
+                  </defs>
+                  <polygon points={areaPoints} fill="url(#chartGradient)" />
+                  <polyline fill="none" stroke="#f5a623" strokeWidth={2.5} points={points} />
 
-                {chartData.length > 0 && (() => {
-                  const lastIdx = chartData.length - 1;
-                  const cxVal = padding + (lastIdx / chartLen) * (width - 2 * padding);
-                  const cyVal = height - padding - ((chartData[lastIdx].price - minPrice) / priceRange) * (height - 2 * padding);
-                  if (isNaN(cxVal) || isNaN(cyVal)) return null;
-                  return (
-                    <circle
-                      cx={cxVal}
-                      cy={cyVal}
-                      r={5}
-                      fill="#f5a623"
-                      className="live-pulse-circle"
-                    />
-                  );
-                })()}
-              </svg>
-            ) : (
-              <div className="flex items-center justify-center h-full text-muted">
-                Connecting to live feeds...
-              </div>
-            )}
-          </div>
+                  {chartData.length > 0 && (() => {
+                    const lastIdx = chartData.length - 1;
+                    const cxVal = padding + (lastIdx / chartLen) * (width - 2 * padding);
+                    const cyVal = height - padding - ((chartData[lastIdx].price - minPrice) / priceRange) * (height - 2 * padding);
+                    if (isNaN(cxVal) || isNaN(cyVal)) return null;
+                    return (
+                      <circle
+                        cx={cxVal}
+                        cy={cyVal}
+                        r={5}
+                        fill="#f5a623"
+                        className="live-pulse-circle"
+                      />
+                    );
+                  })()}
+                </svg>
+              ) : (
+                <div className="flex items-center justify-center h-full text-muted">
+                  Connecting to live feeds...
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Action Panel */}
@@ -462,6 +498,38 @@ export default function TradingSimulator({ selectedAsset, setSelectedAsset, curr
                 value={tradeSize}
                 onChange={(e) => setTradeSize(Math.max(0.01, Number(e.target.value)))}
               />
+            </div>
+
+            {/* Stop Loss & Take Profit Advanced Risk Controls */}
+            <div className="grid grid-cols-2 gap-3" style={{ margin: '0.75rem 0' }}>
+              <div className="form-group" style={{ marginBottom: 0 }}>
+                <label className="form-label flex items-center gap-1 text-xs">
+                  <Shield size={12} style={{ color: '#ef4444' }} />
+                  <span>Stop Loss (SL)</span>
+                </label>
+                <input
+                  type="number"
+                  step="any"
+                  placeholder="Optional"
+                  className="form-input font-mono text-xs"
+                  value={stopLoss}
+                  onChange={(e) => setStopLoss(e.target.value)}
+                />
+              </div>
+              <div className="form-group" style={{ marginBottom: 0 }}>
+                <label className="form-label flex items-center gap-1 text-xs">
+                  <Target size={12} style={{ color: '#10b981' }} />
+                  <span>Take Profit (TP)</span>
+                </label>
+                <input
+                  type="number"
+                  step="any"
+                  placeholder="Optional"
+                  className="form-input font-mono text-xs"
+                  value={takeProfit}
+                  onChange={(e) => setTakeProfit(e.target.value)}
+                />
+              </div>
             </div>
 
             <div className="margin-summary-card">
@@ -591,6 +659,43 @@ export default function TradingSimulator({ selectedAsset, setSelectedAsset, curr
       </div>
 
       <style>{`
+        
+        .chart-toggle-group {
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid var(--color-border);
+          border-radius: var(--radius-full);
+          padding: 2px;
+          gap: 2px;
+        }
+        .chart-mode-pill {
+          background: transparent;
+          border: none;
+          color: #94a3b8;
+          font-size: 0.72rem;
+          padding: 0.25rem 0.65rem;
+          border-radius: var(--radius-full);
+          cursor: pointer;
+          display: inline-flex;
+          align-items: center;
+          gap: 0.35rem;
+          transition: all 0.2s ease;
+        }
+        .chart-mode-pill:hover {
+          color: #ffffff;
+        }
+        .chart-mode-pill.active {
+          background: var(--color-amber);
+          color: #090a0f;
+          font-weight: 700;
+        }
+        .tradingview-embed-box {
+          height: 420px;
+          width: 100%;
+          border-radius: 8px;
+          overflow: hidden;
+          margin-top: 0.5rem;
+        }
+
         .trading-simulator-container {
           width: 100%;
         }

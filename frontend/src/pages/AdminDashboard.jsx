@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Users, BarChart3, Settings, MessageSquare, Shield, DollarSign, TrendingUp, Activity, Search, Edit3, Check, X, RefreshCw, CreditCard, ArrowDownLeft, ArrowUpRight } from 'lucide-react';
+import { Users, BarChart3, Settings, MessageSquare, Shield, DollarSign, TrendingUp, Activity, Search, Edit3, Check, X, RefreshCw, CreditCard, ArrowDownLeft, ArrowUpRight, ShieldCheck, FileText, Eye } from 'lucide-react';
 import { API_BASE_URL } from '../config';
 
 export default function AdminDashboard({ currentUser, onLogout, setActivePage }) {
@@ -15,6 +15,8 @@ export default function AdminDashboard({ currentUser, onLogout, setActivePage })
   const [notification, setNotification] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [transactions, setTransactions] = useState([]);
+  const [kycApps, setKycApps] = useState([]);
+  const [previewDoc, setPreviewDoc] = useState(null);
 
   useEffect(() => {
     fetchAll();
@@ -24,17 +26,20 @@ export default function AdminDashboard({ currentUser, onLogout, setActivePage })
 
   const fetchAll = async () => {
     try {
-      const [uRes, tRes, mRes, cRes, txRes] = await Promise.all([
+      const [uRes, tRes, mRes, cRes, txRes, kycRes] = await Promise.all([
         fetch(`${API_BASE_URL}/api/admin/users`),
         fetch(`${API_BASE_URL}/api/admin/trades`),
         fetch(`${API_BASE_URL}/api/markets`),
-        fetch(`${API_BASE_URL}/api/admin/messages`)
+        fetch(`${API_BASE_URL}/api/admin/messages`),
+        fetch(`${API_BASE_URL}/api/admin/transactions`),
+        fetch(`${API_BASE_URL}/api/admin/kyc`)
       ]);
       if (uRes.ok) { const r = await uRes.json(); setUsers(r.data); }
       if (tRes.ok) { const r = await tRes.json(); setAllTrades(r.data); }
       if (mRes.ok) { const r = await mRes.json(); setMarkets(r.data); }
       if (cRes.ok) { const r = await cRes.json(); setMessages(r.data); }
       if (txRes && txRes.ok) { const r = await txRes.json(); setTransactions(r.data); }
+      if (kycRes && kycRes.ok) { const r = await kycRes.json(); setKycApps(r.data); }
     } catch (e) {}
   };
 
@@ -76,6 +81,23 @@ export default function AdminDashboard({ currentUser, onLogout, setActivePage })
     }
   };
 
+  
+  const handleKycReview = async (appId, status) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/kyc/${appId}/review`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status })
+      });
+      if (response.ok) {
+        showNotif('success', `KYC Application ${status} successfully.`);
+        fetchAll();
+      }
+    } catch (e) {
+      showNotif('error', 'Failed to update KYC status.');
+    }
+  };
+
   const handlePriceOverride = async () => {
     if (!overridePrice) return;
     try {
@@ -98,6 +120,7 @@ export default function AdminDashboard({ currentUser, onLogout, setActivePage })
     { id: 'users', label: 'User Management', icon: Users },
     { id: 'trades', label: 'Trade Ledger', icon: BarChart3 },
     { id: 'funding', label: 'Funding Requests', icon: CreditCard },
+    { id: 'kyc', label: 'KYC Applications', icon: ShieldCheck },
     { id: 'markets', label: 'Market Control', icon: TrendingUp },
     { id: 'messages', label: 'Support Inbox', icon: MessageSquare },
   ];
@@ -440,6 +463,42 @@ export default function AdminDashboard({ currentUser, onLogout, setActivePage })
           )}
         </main>
       </div>
+
+      {/* Document Preview Modal */}
+      {previewDoc && (
+        <div 
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(6px)', zIndex: 3000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}
+          onClick={() => setPreviewDoc(null)}
+        >
+          <div 
+            className="card card-static" 
+            style={{ maxWidth: '640px', width: '100%', padding: '1.5rem', background: '#0e111a', border: '1px solid var(--color-border)', borderRadius: '12px' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-center" style={{ marginBottom: '1rem', paddingBottom: '0.75rem', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+              <div>
+                <h4 style={{ color: '#ffffff' }}>{previewDoc.type || 'Document Preview'}</h4>
+                <span className="text-xs text-muted font-mono">{previewDoc.name}</span>
+              </div>
+              <button 
+                className="btn btn-secondary btn-sm" 
+                onClick={() => setPreviewDoc(null)}
+                style={{ padding: '0.35rem 0.65rem' }}
+              >
+                <X size={16} /> Close
+              </button>
+            </div>
+            <div style={{ maxHeight: '480px', overflowY: 'auto', textAlign: 'center', background: '#06070a', borderRadius: '8px', padding: '1rem' }}>
+              <img 
+                src={previewDoc.src} 
+                alt="Document Preview" 
+                style={{ maxWidth: '100%', maxHeight: '440px', objectFit: 'contain', borderRadius: '4px' }} 
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
 
       <style>{`
         .admin-dash { min-height: 100vh; background: var(--color-bg); }

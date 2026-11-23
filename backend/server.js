@@ -54,6 +54,40 @@ let markets = [
 
 let trades = [];
 let contactMessages = [];
+let investments = [
+  {
+    id: 'INV-BRZ9182',
+    userId: 'user_1',
+    planName: 'Bronze',
+    amount: 1000,
+    roiPercent: 20,
+    targetReturn: 1200,
+    durationHours: 24,
+    startDate: new Date(Date.now() - 1000 * 3600 * 18).toISOString(),
+    endDate: new Date(Date.now() + 1000 * 3600 * 6).toISOString(),
+    status: 'ACTIVE'
+  }
+];
+let kycApplications = [
+  {
+    id: 'KYC-APP-8821',
+    userId: 'user_1',
+    userName: 'Alexander Wright',
+    userEmail: 'client@continuum-trading.com',
+    accountNumber: 'CT-892104-LIVE',
+    idType: 'Passport',
+    idNumber: 'P89214772',
+    idDocName: 'alexander_wright_passport.jpg',
+    idDocData: 'https://images.unsplash.com/photo-1544717305-2782549b5136?w=600&auto=format&fit=crop&q=60',
+    addressType: 'Bank Statement',
+    addressDocName: 'barclays_statement_nov2026.pdf',
+    addressDocData: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=600&auto=format&fit=crop&q=60',
+    status: 'verified',
+    submittedAt: new Date(Date.now() - 86400000 * 2).toISOString(),
+    reviewedAt: new Date(Date.now() - 86400000).toISOString(),
+    reviewedBy: 'Compliance Desk'
+  }
+];
 let walletTransactions = [
   {
     id: 'DEP-INIT01',
@@ -93,6 +127,40 @@ const tickPrices = () => {
 
 // Tick the market prices every 3 seconds in the background
 setInterval(tickPrices, 3000);
+
+// ==========================================
+// AUTOMATED PASSIVE RETURN ACCRUAL ENGINE
+// ==========================================
+const processInvestmentAccruals = () => {
+  const now = Date.now();
+  investments.forEach(inv => {
+    if (inv.status === 'ACTIVE') {
+      const start = new Date(inv.startDate).getTime();
+      const end = new Date(inv.endDate).getTime();
+      
+      // Auto-maturity check
+      if (now >= end) {
+        inv.status = 'COMPLETED';
+        const user = users.find(u => u.id === inv.userId);
+        if (user) {
+          user.balance = Number((user.balance + inv.targetReturn).toFixed(2));
+          walletTransactions.unshift({
+            id: `PAY-${Math.random().toString(36).substr(2, 8).toUpperCase()}`,
+            userId: inv.userId,
+            type: 'PAYOUT',
+            method: `${inv.planName} Plan Return`,
+            amount: inv.targetReturn,
+            status: 'COMPLETED',
+            timestamp: new Date().toISOString()
+          });
+          console.log(`Investment ${inv.id} matured! Paid out ${inv.targetReturn} to ${user.name}`);
+        }
+      }
+    }
+  });
+};
+setInterval(processInvestmentAccruals, 10000);
+
 
 // ==========================================
 // AUTHENTICATION ROUTES
@@ -452,6 +520,192 @@ app.post('/api/admin/transactions/:id/status', (req, res) => {
   }
   tx.status = status;
   res.json({ status: 'success', data: tx });
+});
+
+
+// ==========================================
+// INVESTMENT PLANS ACCRUAL ROUTES
+// ==========================================
+
+// Get user investments with live accrued profit calculation
+app.get('/api/investments/:userId', (req, res) => {
+  const { userId } = req.params;
+  const now = Date.now();
+
+  const userInvs = investments
+    .filter(inv => inv.userId === userId || userId === 'all')
+    .map(inv => {
+      const start = new Date(inv.startDate).getTime();
+      const end = new Date(inv.endDate).getTime();
+      const duration = end - start || 1;
+      const elapsed = Math.max(0, now - start);
+      const progress = Math.min(100, Math.floor((elapsed / duration) * 100));
+
+      const totalProfit = inv.targetReturn - inv.amount;
+      const accruedProfit = inv.status === 'COMPLETED' 
+        ? totalProfit 
+        : Number((totalProfit * (progress / 100)).toFixed(2));
+
+      const msRemaining = Math.max(0, end - now);
+      const hoursRemaining = Math.floor(msRemaining / (1000 * 3600));
+      const minsRemaining = Math.floor((msRemaining % (1000 * 3600)) / (1000 * 60));
+
+      return {
+        ...inv,
+        progress,
+        accruedProfit,
+        totalProfit,
+        timeRemainingFormatted: `${hoursRemaining}h ${minsRemaining}m`
+      };
+    });
+
+  res.json({ status: 'success', data: userInvs });
+});
+
+// Create a new investment contract
+app.post('/api/investments/create', (req, res) => {
+  const { userId, planName, amount, roiPercent, durationHours } = req.body;
+  const numAmount = parseFloat(amount);
+
+  if (!userId || !numAmount || numAmount <= 0) {
+    return res.status(400).json({ status: 'error', message: 'Valid user ID and investment amount required.' });
+  }
+
+  const user = users.find(u => u.id === userId);
+  if (!user && userId !== 'guest') {
+    return res.status(404).json({ status: 'error', message: 'Client profile not found.' });
+  }
+
+  if (user && user.balance < numAmount) {
+    return res.status(400).json({ status: 'error', message: 'Insufficient funds. Please deposit into your wallet first.' });
+  }
+
+  // Deduct balance
+  if (user) {
+    user.balance = Number((user.balance - numAmount).toFixed(2));
+  }
+
+  const numHours = parseInt(durationHours) || (planName === 'Premium' ? 72 : planName === 'Silver' ? 48 : 24);
+  const numRoi = parseFloat(roiPercent) || (planName === 'Premium' ? 60 : planName === 'Silver' ? 40 : 20);
+  const targetReturn = Number((numAmount * (1 + numRoi / 100)).toFixed(2));
+
+  const newInv = {
+    id: `INV-${Math.random().toString(36).substr(2, 8).toUpperCase()}`,
+    userId: userId || 'guest',
+    planName: planName || 'Bronze',
+    amount: numAmount,
+    roiPercent: numRoi,
+    targetReturn: targetReturn,
+    durationHours: numHours,
+    startDate: new Date().toISOString(),
+    endDate: new Date(Date.now() + numHours * 3600 * 1000).toISOString(),
+    status: 'ACTIVE'
+  };
+
+  investments.unshift(newInv);
+
+  // Record allocation transaction
+  walletTransactions.unshift({
+    id: `ALLOC-${Math.random().toString(36).substr(2, 8).toUpperCase()}`,
+    userId: userId || 'guest',
+    type: 'INVESTMENT',
+    method: `${planName} Plan Allocation`,
+    amount: numAmount,
+    status: 'COMPLETED',
+    timestamp: new Date().toISOString()
+  });
+
+  res.status(201).json({
+    status: 'success',
+    data: newInv,
+    newBalance: user ? user.balance : 10000
+  });
+});
+
+// ==========================================
+// KYC & REGULATORY COMPLIANCE ROUTES
+// ==========================================
+
+// Get user KYC status and details
+app.get('/api/kyc/:userId', (req, res) => {
+  const { userId } = req.params;
+  const user = users.find(u => u.id === userId);
+  const application = kycApplications.find(k => k.userId === userId);
+
+  res.json({
+    status: 'success',
+    data: {
+      kycStatus: user ? user.kycStatus : 'unverified',
+      application: application || null
+    }
+  });
+});
+
+// Submit KYC documents
+app.post('/api/kyc/submit', (req, res) => {
+  const { userId, idType, idNumber, idDocName, idDocData, addressType, addressDocName, addressDocData } = req.body;
+
+  if (!userId || !idDocName || !addressDocName) {
+    return res.status(400).json({ status: 'error', message: 'Identity and residential documents required.' });
+  }
+
+  const user = users.find(u => u.id === userId);
+  if (user) {
+    user.kycStatus = 'pending';
+  }
+
+  const existingIdx = kycApplications.findIndex(k => k.userId === userId);
+  const appData = {
+    id: existingIdx !== -1 ? kycApplications[existingIdx].id : `KYC-APP-${Math.random().toString(36).substr(2, 8).toUpperCase()}`,
+    userId,
+    userName: user ? user.name : 'Client',
+    userEmail: user ? user.email : 'Unknown',
+    accountNumber: user ? user.accountNumber : 'CT-LIVE',
+    idType: idType || 'National ID / Passport',
+    idNumber: idNumber || 'N/A',
+    idDocName,
+    idDocData: idDocData || 'https://images.unsplash.com/photo-1544717305-2782549b5136?w=600&auto=format&fit=crop&q=60',
+    addressType: addressType || 'Bank Statement / Utility Bill',
+    addressDocName,
+    addressDocData: addressDocData || 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=600&auto=format&fit=crop&q=60',
+    status: 'pending',
+    submittedAt: new Date().toISOString()
+  };
+
+  if (existingIdx !== -1) {
+    kycApplications[existingIdx] = appData;
+  } else {
+    kycApplications.unshift(appData);
+  }
+
+  res.status(201).json({ status: 'success', data: appData });
+});
+
+// Admin: Get all KYC applications
+app.get('/api/admin/kyc', (req, res) => {
+  res.json({ status: 'success', data: kycApplications });
+});
+
+// Admin: Review KYC application (approve / reject)
+app.post('/api/admin/kyc/:id/review', (req, res) => {
+  const { status, notes } = req.body;
+  const app = kycApplications.find(k => k.id === req.params.id);
+
+  if (!app) {
+    return res.status(404).json({ status: 'error', message: 'KYC application not found.' });
+  }
+
+  app.status = status; // 'verified' | 'rejected'
+  app.reviewedAt = new Date().toISOString();
+  app.notes = notes || '';
+  app.reviewedBy = 'Compliance Officer';
+
+  const user = users.find(u => u.id === app.userId);
+  if (user) {
+    user.kycStatus = status;
+  }
+
+  res.json({ status: 'success', data: app });
 });
 
 // ==========================================

@@ -8,7 +8,7 @@ import MarketTable from '../components/MarketTable';
 import TradingSimulator from '../components/TradingSimulator';
 import CompareCalculator from '../components/CompareCalculator';
 
-export default function Home({ selectedAsset, setSelectedAsset, currentUser, onOpenAuth, onOpenFunding }) {
+export default function Home({ selectedAsset, setSelectedAsset, currentUser, onOpenAuth, onOpenFunding, onOpenPlanModal }) {
   // Intersection Observer for scroll animations
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -106,10 +106,10 @@ export default function Home({ selectedAsset, setSelectedAsset, currentUser, onO
   ];
 
   const handlePlanClick = (tier) => {
-    if (onOpenFunding) {
+    if (onOpenPlanModal) {
+      onOpenPlanModal(tier);
+    } else if (onOpenFunding) {
       onOpenFunding('deposit', tier.minRaw);
-    } else if (currentUser) {
-      document.getElementById('funding')?.scrollIntoView({ behavior: 'smooth' });
     } else {
       onOpenAuth();
     }

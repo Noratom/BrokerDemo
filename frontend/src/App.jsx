@@ -3,6 +3,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import LiveTicker from './components/LiveTicker';
 import DepositWithdrawModal from './components/DepositWithdrawModal';
+import PlanInvestModal from './components/PlanInvestModal';
 import Home from './pages/Home';
 import About from './pages/About';
 import AdminDashboard from './pages/AdminDashboard';
@@ -20,9 +21,15 @@ function App() {
     return saved ? JSON.parse(saved) : null;
   });
   const [fundingModal, setFundingModal] = useState({ isOpen: false, tab: 'deposit', amount: '' });
+  const [planModal, setPlanModal] = useState({ isOpen: false, plan: null });
 
   const handleOpenFunding = (tab = 'deposit', amount = '') => {
     setFundingModal({ isOpen: true, tab, amount });
+  };
+
+  
+  const handleOpenPlanModal = (plan) => {
+    setPlanModal({ isOpen: true, plan });
   };
 
   const handleBalanceUpdate = (newBalance) => {
@@ -100,6 +107,7 @@ function App() {
             currentUser={currentUser}
             onOpenAuth={() => setActivePage('login')}
             onOpenFunding={handleOpenFunding}
+            onOpenPlanModal={handleOpenPlanModal}
           />
         );
       case 'about':
@@ -207,6 +215,7 @@ function App() {
             currentUser={currentUser}
             onOpenAuth={() => setActivePage('login')}
             onOpenFunding={handleOpenFunding}
+            onOpenPlanModal={handleOpenPlanModal}
           />
         );
     }
@@ -241,6 +250,20 @@ function App() {
         currentUser={currentUser}
         onBalanceUpdate={handleBalanceUpdate}
         onOpenAuth={() => { setFundingModal({ ...fundingModal, isOpen: false }); setActivePage('login'); }}
+      />
+
+      
+      {/* Investment Plan Allocation Modal */}
+      <PlanInvestModal
+        isOpen={planModal.isOpen}
+        onClose={() => setPlanModal({ isOpen: false, plan: null })}
+        selectedPlan={planModal.plan}
+        currentUser={currentUser}
+        onInvestSuccess={(newInv, newBalance) => {
+          handleBalanceUpdate(newBalance);
+        }}
+        onOpenFunding={handleOpenFunding}
+        onOpenAuth={() => setActivePage('login')}
       />
 
       {/* Footer Disclaimer & Links */}

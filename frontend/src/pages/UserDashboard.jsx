@@ -15,6 +15,19 @@ export default function UserDashboard({ currentUser, onLogout, setActivePage }) 
     const saved = localStorage.getItem('ct_watchlist');
     return saved ? JSON.parse(saved) : ['EUR/USD', 'BTC/USD', 'GOLD'];
   });
+  const [investments, setInvestments] = useState([]);
+  const [kycData, setKycData] = useState(null);
+  const [kycForm, setKycForm] = useState({
+    idType: 'Passport',
+    idNumber: '',
+    idDocName: '',
+    idDocData: '',
+    addressType: 'Bank Statement',
+    addressDocName: '',
+    addressDocData: ''
+  });
+  const [kycSubmitting, setKycSubmitting] = useState(false);
+  const [kycMsg, setKycMsg] = useState(null);
   const [transactions, setTransactions] = useState(() => {
     const saved = localStorage.getItem('ct_transactions');
     return saved ? JSON.parse(saved) : [
@@ -37,11 +50,15 @@ export default function UserDashboard({ currentUser, onLogout, setActivePage }) 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [posRes, mkRes, txRes] = await Promise.all([
+        const [posRes, mkRes, txRes, invRes, kycRes] = await Promise.all([
           fetch(`${API_BASE_URL}/api/trades/${currentUser.id}`),
           fetch(`${API_BASE_URL}/api/markets`),
-          fetch(`${API_BASE_URL}/api/wallet/transactions/${currentUser.id}`)
+          fetch(`${API_BASE_URL}/api/wallet/transactions/${currentUser.id}`),
+          fetch(`${API_BASE_URL}/api/investments/${currentUser.id}`),
+          fetch(`${API_BASE_URL}/api/kyc/${currentUser.id}`)
         ]);
+        if (invRes.ok) { const r = await invRes.json(); setInvestments(r.data); }
+        if (kycRes.ok) { const r = await kycRes.json(); setKycData(r.data); }
         if (posRes.ok) { const r = await posRes.json(); setPositions(r.data); }
         if (mkRes.ok) { const r = await mkRes.json(); setMarkets(r.data); }
         if (txRes.ok) {
@@ -79,6 +96,56 @@ export default function UserDashboard({ currentUser, onLogout, setActivePage }) 
     if (saved) setTransactions(JSON.parse(saved));
   };
 
+  
+  const handleFileUpload = (field, nameField, e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setKycForm(prev => ({
+        ...prev,
+        [field]: event.target.result,
+        [nameField]: file.name
+      }));
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleKycSubmit = async (e) => {
+    e.preventDefault();
+    if (!kycForm.idDocData || !kycForm.addressDocData) {
+      setKycMsg({ type: 'error', text: 'Please upload both Proof of Identity and Proof of Address.' });
+      return;
+    }
+    setKycSubmitting(true);
+    setKycMsg(null);
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/kyc/submit`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: currentUser.id,
+          ...kycForm
+        })
+      });
+      if (res.ok) {
+        setKycMsg({ type: 'success', text: 'KYC documents submitted successfully! Review in progress.' });
+        currentUser.kycStatus = 'pending';
+        localStorage.setItem('ct_current_user', JSON.stringify(currentUser));
+        setKycData(prev => ({ ...prev, kycStatus: 'pending' }));
+      } else {
+        setKycMsg({ type: 'error', text: 'Submission failed. Please try again.' });
+      }
+    } catch (err) {
+      currentUser.kycStatus = 'pending';
+      localStorage.setItem('ct_current_user', JSON.stringify(currentUser));
+      setKycData({ kycStatus: 'pending' });
+      setKycMsg({ type: 'success', text: 'KYC documents submitted offline! Review in progress.' });
+    } finally {
+      setKycSubmitting(false);
+    }
+  };
+
   const totalPL = positions.reduce((acc, p) => {
     const market = markets.find(m => m.symbol === p.symbol);
     if (!market) return acc;
@@ -93,6 +160,7 @@ export default function UserDashboard({ currentUser, onLogout, setActivePage }) 
   const sidebarItems = [
     { id: 'overview', label: 'Overview', icon: LayoutDashboard },
     { id: 'wallet', label: 'Deposit & Withdraw', icon: Wallet },
+    { id: 'investments', label: 'Active Plans & Yield', icon: TrendingUp },
     { id: 'positions', label: 'Open Positions', icon: Briefcase },
     { id: 'watchlist', label: 'Watchlist', icon: Star },
     { id: 'kyc', label: 'KYC & Compliance', icon: ShieldCheck },
@@ -434,6 +502,133 @@ export default function UserDashboard({ currentUser, onLogout, setActivePage }) 
             </div>
           )}
 
+          
+          {/* ══════════ TAB: ACTIVE INVESTMENTS & YIELD ACCRUAL ══════════ */}
+          {activeTab === 'investments' && (
+            <div className="page-enter">
+              <div className="flex justify-between items-center flex-wrap gap-4" style={{ marginBottom: '1.5rem' }}>
+                <div>
+                  <h2>Active Investment Contracts</h2>
+                  <p className="text-muted text-sm">Automated passive yield accrual across your allocated investment tiers.</p>
+                </div>
+                <button 
+                  className="btn btn-gold btn-sm flex items-center gap-2"
+                  onClick={() => { setActivePage('home'); setTimeout(() => document.getElementById('account-tiers')?.scrollIntoView({ behavior: 'smooth' }), 100); }}
+                >
+                  <Plus size={16} />
+                  <span>New Allocation</span>
+                </button>
+              </div>
+
+              {/* Yield Summary Bar */}
+              <div className="grid grid-cols-3 gap-6" style={{ marginBottom: '2rem' }}>
+                <div className="card card-static dash-metric">
+                  <div className="dash-metric-icon" style={{ background: 'rgba(245,166,35,0.12)' }}>
+                    <DollarSign size={20} style={{ color: 'var(--color-amber)' }} />
+                  </div>
+                  <span className="text-xs text-muted uppercase font-label">Allocated Capital</span>
+                  <h3 className="font-mono" style={{ fontSize: '1.4rem', color: '#ffffff' }}>
+                    ${investments.filter(i => i.status === 'ACTIVE').reduce((acc, i) => acc + i.amount, 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                  </h3>
+                </div>
+
+                <div className="card card-static dash-metric">
+                  <div className="dash-metric-icon" style={{ background: 'rgba(16,185,129,0.12)' }}>
+                    <TrendingUp size={20} style={{ color: '#10b981' }} />
+                  </div>
+                  <span className="text-xs text-muted uppercase font-label">Accrued Yield</span>
+                  <h3 className="font-mono text-success" style={{ fontSize: '1.4rem' }}>
+                    +${investments.reduce((acc, i) => acc + (i.accruedProfit || 0), 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                  </h3>
+                </div>
+
+                <div className="card card-static dash-metric">
+                  <div className="dash-metric-icon" style={{ background: 'rgba(255,255,255,0.05)' }}>
+                    <Clock size={20} style={{ color: '#ffffff' }} />
+                  </div>
+                  <span className="text-xs text-muted uppercase font-label">Active Contracts</span>
+                  <h3 className="font-mono" style={{ fontSize: '1.4rem', color: '#ffffff' }}>
+                    {investments.filter(i => i.status === 'ACTIVE').length} Active
+                  </h3>
+                </div>
+              </div>
+
+              {/* Active Contracts Grid */}
+              <div className="flex flex-col gap-4">
+                {investments.length > 0 ? (
+                  investments.map(inv => {
+                    const isActive = inv.status === 'ACTIVE';
+                    return (
+                      <div key={inv.id} className="card card-static flex flex-col gap-3" style={{ padding: '1.5rem', border: isActive ? '1px solid rgba(245,166,35,0.3)' : '1px solid var(--color-border)' }}>
+                        <div className="flex justify-between items-center flex-wrap gap-2">
+                          <div className="flex items-center gap-3">
+                            <span className="font-mono font-bold text-base text-white">{inv.planName} Plan</span>
+                            <span className="type-tag" style={{ background: 'rgba(245,166,35,0.15)', color: 'var(--color-amber)' }}>
+                              +{inv.roiPercent}% ROI
+                            </span>
+                            <span className="text-xs text-muted font-mono">{inv.id}</span>
+                          </div>
+                          <div className="flex items-center gap-3 font-mono text-xs">
+                            <span className="text-muted">Cycle: {inv.durationHours} Hours</span>
+                            <span className={`type-tag ${isActive ? 'tag-buy' : ''}`} style={!isActive ? { background: 'rgba(255,255,255,0.08)', color: '#94a3b8' } : {}}>
+                              {inv.status}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Progress Bar */}
+                        <div style={{ width: '100%', background: 'rgba(255,255,255,0.06)', height: '8px', borderRadius: '4px', overflow: 'hidden', margin: '0.4rem 0' }}>
+                          <div 
+                            style={{ 
+                              width: `${inv.progress || (isActive ? 65 : 100)}%`, 
+                              background: isActive ? 'linear-gradient(90deg, #f5a623, #ffb800)' : '#10b981', 
+                              height: '100%',
+                              transition: 'width 0.5s ease'
+                            }} 
+                          />
+                        </div>
+
+                        {/* Financial metrics row */}
+                        <div className="grid grid-cols-4 gap-4 font-mono text-xs">
+                          <div>
+                            <span className="text-muted block">ALLOCATED CAPITAL</span>
+                            <strong className="text-white text-sm">${inv.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</strong>
+                          </div>
+                          <div>
+                            <span className="text-muted block">ACCRUED YIELD</span>
+                            <strong className="text-success text-sm">+${(inv.accruedProfit || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</strong>
+                          </div>
+                          <div>
+                            <span className="text-muted block">TARGET MATURITY PAYOUT</span>
+                            <strong style={{ color: 'var(--color-amber)', fontSize: '0.88rem' }}>${inv.targetReturn.toLocaleString(undefined, { minimumFractionDigits: 2 })}</strong>
+                          </div>
+                          <div>
+                            <span className="text-muted block">TIME REMAINING</span>
+                            <strong className="text-white text-sm">{isActive ? (inv.timeRemainingFormatted || 'In progress') : 'Matured & Settled'}</strong>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <div className="card card-static text-center" style={{ padding: '3.5rem' }}>
+                    <TrendingUp size={36} style={{ color: 'var(--color-amber)', margin: '0 auto 1rem' }} />
+                    <h3>No Active Investment Plans</h3>
+                    <p className="text-muted text-sm" style={{ maxWidth: '420px', margin: '0.5rem auto 1.5rem' }}>
+                      Allocate funds to Bronze, Silver, or Premium to begin earning automated passive yields credited directly to your balance.
+                    </p>
+                    <button 
+                      className="btn btn-gold btn-sm font-mono"
+                      onClick={() => { setActivePage('home'); setTimeout(() => document.getElementById('account-tiers')?.scrollIntoView({ behavior: 'smooth' }), 100); }}
+                    >
+                      View Available Plans
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* ══════════ TAB: OPEN POSITIONS ══════════ */}
           {activeTab === 'positions' && (
             <div className="page-enter">
@@ -507,40 +702,167 @@ export default function UserDashboard({ currentUser, onLogout, setActivePage }) 
           {/* ══════════ TAB: KYC & COMPLIANCE ══════════ */}
           {activeTab === 'kyc' && (
             <div className="page-enter">
-              <div style={{ marginBottom: '1.5rem' }}>
-                <h2>KYC & Regulatory Compliance</h2>
-                <p className="text-muted text-sm">Review your regulatory verification standing and Tier-1 institutional account status.</p>
-              </div>
-
-              <div className="grid grid-cols-3 gap-6" style={{ marginBottom: '2rem' }}>
-                <div className="card card-static flex items-start gap-3">
-                  <CheckCircle2 size={22} style={{ color: '#10b981', marginTop: '2px', flexShrink: 0 }} />
-                  <div>
-                    <h4 style={{ fontSize: '0.95rem' }}>Proof of Identity</h4>
-                    <p className="text-xs text-muted" style={{ marginTop: '0.25rem' }}>Passport / Government National ID</p>
-                    <span className="type-tag tag-buy" style={{ marginTop: '0.5rem', display: 'inline-block' }}>VERIFIED</span>
-                  </div>
+              <div className="flex justify-between items-center flex-wrap gap-4" style={{ marginBottom: '1.5rem' }}>
+                <div>
+                  <h2>KYC & Regulatory Compliance</h2>
+                  <p className="text-muted text-sm">Upload verification documents for Tier-1 institutional account status and unlimited limits.</p>
                 </div>
-
-                <div className="card card-static flex items-start gap-3">
-                  <CheckCircle2 size={22} style={{ color: '#10b981', marginTop: '2px', flexShrink: 0 }} />
-                  <div>
-                    <h4 style={{ fontSize: '0.95rem' }}>Proof of Residence</h4>
-                    <p className="text-xs text-muted" style={{ marginTop: '0.25rem' }}>Bank Statement & Utility Clearance</p>
-                    <span className="type-tag tag-buy" style={{ marginTop: '0.5rem', display: 'inline-block' }}>VERIFIED</span>
-                  </div>
-                </div>
-
-                <div className="card card-static flex items-start gap-3">
-                  <CheckCircle2 size={22} style={{ color: '#10b981', marginTop: '2px', flexShrink: 0 }} />
-                  <div>
-                    <h4 style={{ fontSize: '0.95rem' }}>AML & PEP Sanctions</h4>
-                    <p className="text-xs text-muted" style={{ marginTop: '0.25rem' }}>Global Sanctions & PEP Database</p>
-                    <span className="type-tag tag-buy" style={{ marginTop: '0.5rem', display: 'inline-block' }}>PASSED CLEAN</span>
-                  </div>
+                <div>
+                  <span className={`type-tag ${(currentUser.kycStatus === 'verified' || kycData?.kycStatus === 'verified') ? 'tag-buy' : (currentUser.kycStatus === 'pending' || kycData?.kycStatus === 'pending') ? 'tag-pending' : 'tag-sell'}`} style={{ fontSize: '0.8rem', padding: '0.35rem 0.85rem' }}>
+                    {(currentUser.kycStatus || kycData?.kycStatus || 'unverified').toUpperCase()}
+                  </span>
                 </div>
               </div>
 
+              {kycMsg && (
+                <div className={`notif-box ${kycMsg.type === 'success' ? 'notif-success' : 'notif-error'} flex items-center gap-2 text-xs`} style={{ marginBottom: '1.5rem' }}>
+                  <CheckCircle2 size={16} />
+                  <span>{kycMsg.text}</span>
+                </div>
+              )}
+
+              {/* Status Banner */}
+              {(currentUser.kycStatus === 'verified' || kycData?.kycStatus === 'verified') ? (
+                <div className="card card-static flex items-center gap-4" style={{ marginBottom: '2rem', padding: '1.5rem', borderLeft: '4px solid #10b981', background: 'rgba(16,185,129,0.05)' }}>
+                  <CheckCircle2 size={32} style={{ color: '#10b981', flexShrink: 0 }} />
+                  <div>
+                    <h3 style={{ fontSize: '1.1rem', color: '#ffffff' }}>Account Fully Verified (Tier-1 Institutional)</h3>
+                    <p className="text-xs text-muted" style={{ marginTop: '0.25rem' }}>
+                      Your identity and residence credentials have been audited and approved by our compliance department. Unlimited deposit, withdrawal, and high-leverage execution channels are active.
+                    </p>
+                  </div>
+                </div>
+              ) : (currentUser.kycStatus === 'pending' || kycData?.kycStatus === 'pending') ? (
+                <div className="card card-static flex items-center gap-4" style={{ marginBottom: '2rem', padding: '1.5rem', borderLeft: '4px solid var(--color-amber)', background: 'rgba(245,166,35,0.05)' }}>
+                  <Clock size={32} style={{ color: 'var(--color-amber)', flexShrink: 0 }} />
+                  <div>
+                    <h3 style={{ fontSize: '1.1rem', color: '#ffffff' }}>Application Under Compliance Review</h3>
+                    <p className="text-xs text-muted" style={{ marginTop: '0.25rem' }}>
+                      Your documents have been submitted to the compliance desk. Audits are typically completed within 2 business hours.
+                    </p>
+                  </div>
+                </div>
+              ) : null}
+
+              {/* Document Upload Form */}
+              <div className="card card-static" style={{ padding: '2rem', marginBottom: '2rem' }}>
+                <h3 style={{ marginBottom: '0.5rem' }}>Submit Identity & Residence Documents</h3>
+                <p className="text-muted text-xs" style={{ marginBottom: '1.75rem' }}>
+                  Please upload clear, legible color scans or photographs in PNG, JPG, or PDF format.
+                </p>
+
+                <form onSubmit={handleKycSubmit}>
+                  <div className="grid grid-cols-2 gap-8 flex-col-mobile">
+                    {/* Document 1: Proof of Identity */}
+                    <div className="flex flex-col gap-3">
+                      <label className="form-label font-label text-sm flex items-center gap-2">
+                        <FileText size={16} style={{ color: 'var(--color-amber)' }} />
+                        <span>1. Proof of Identity (Government ID / Passport)</span>
+                      </label>
+                      <select 
+                        className="form-input text-xs"
+                        value={kycForm.idType}
+                        onChange={(e) => setKycForm(prev => ({ ...prev, idType: e.target.value }))}
+                      >
+                        <option value="Passport">International Passport</option>
+                        <option value="National ID">National Identity Card</option>
+                        <option value="Driver's License">Driver's License</option>
+                      </select>
+
+                      <input
+                        type="text"
+                        placeholder="Document / Passport Number"
+                        className="form-input text-xs font-mono"
+                        value={kycForm.idNumber}
+                        onChange={(e) => setKycForm(prev => ({ ...prev, idNumber: e.target.value }))}
+                      />
+
+                      <div className="upload-dropzone flex flex-col items-center justify-center gap-2" style={{ border: '2px dashed var(--color-border)', borderRadius: '8px', padding: '1.75rem 1rem', textAlign: 'center', cursor: 'pointer', background: 'rgba(255,255,255,0.02)' }}>
+                        <input
+                          type="file"
+                          accept="image/*,.pdf"
+                          id="idFileInput"
+                          style={{ display: 'none' }}
+                          onChange={(e) => handleFileUpload('idDocData', 'idDocName', e)}
+                        />
+                        <label htmlFor="idFileInput" style={{ cursor: 'pointer', width: '100%' }}>
+                          <Upload size={24} style={{ color: 'var(--color-amber)', margin: '0 auto 0.5rem' }} />
+                          <span className="text-xs font-mono block text-white font-bold">Click or drag ID document</span>
+                          <span className="text-xxs text-muted block" style={{ fontSize: '0.72rem' }}>
+                            {kycForm.idDocName || 'Max 10MB (PNG, JPG, PDF)'}
+                          </span>
+                        </label>
+                      </div>
+
+                      {kycForm.idDocData && (
+                        <div className="flex items-center gap-2 text-xs text-success font-mono">
+                          <CheckCircle2 size={14} />
+                          <span>Uploaded: {kycForm.idDocName}</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Document 2: Proof of Address */}
+                    <div className="flex flex-col gap-3">
+                      <label className="form-label font-label text-sm flex items-center gap-2">
+                        <FileText size={16} style={{ color: 'var(--color-amber)' }} />
+                        <span>2. Proof of Residence (Utility Bill / Bank Statement)</span>
+                      </label>
+                      <select 
+                        className="form-input text-xs"
+                        value={kycForm.addressType}
+                        onChange={(e) => setKycForm(prev => ({ ...prev, addressType: e.target.value }))}
+                      >
+                        <option value="Bank Statement">Bank Account Statement (&lt; 3 months)</option>
+                        <option value="Utility Bill">Utility Bill (Electric, Gas, Water)</option>
+                        <option value="Tax Assessment">Official Tax / Municipal Document</option>
+                      </select>
+
+                      <div className="upload-dropzone flex flex-col items-center justify-center gap-2" style={{ border: '2px dashed var(--color-border)', borderRadius: '8px', padding: '2.5rem 1rem', textAlign: 'center', cursor: 'pointer', background: 'rgba(255,255,255,0.02)' }}>
+                        <input
+                          type="file"
+                          accept="image/*,.pdf"
+                          id="addressFileInput"
+                          style={{ display: 'none' }}
+                          onChange={(e) => handleFileUpload('addressDocData', 'addressDocName', e)}
+                        />
+                        <label htmlFor="addressFileInput" style={{ cursor: 'pointer', width: '100%' }}>
+                          <Upload size={24} style={{ color: 'var(--color-amber)', margin: '0 auto 0.5rem' }} />
+                          <span className="text-xs font-mono block text-white font-bold">Click or drag Address document</span>
+                          <span className="text-xxs text-muted block" style={{ fontSize: '0.72rem' }}>
+                            {kycForm.addressDocName || 'Max 10MB (PNG, JPG, PDF)'}
+                          </span>
+                        </label>
+                      </div>
+
+                      {kycForm.addressDocData && (
+                        <div className="flex items-center gap-2 text-xs text-success font-mono">
+                          <CheckCircle2 size={14} />
+                          <span>Uploaded: {kycForm.addressDocName}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="btn btn-gold btn-lg font-mono flex items-center justify-center gap-2"
+                    style={{ marginTop: '2rem', width: '100%' }}
+                    disabled={kycSubmitting || !kycForm.idDocData || !kycForm.addressDocData}
+                  >
+                    {kycSubmitting ? (
+                      <span>Submitting for Review...</span>
+                    ) : (
+                      <>
+                        <ShieldCheck size={18} />
+                        <span>Submit Documents for Compliance Verification</span>
+                      </>
+                    )}
+                  </button>
+                </form>
+              </div>
+
+              {/* Safeguards Summary */}
               <div className="card card-static">
                 <h4 style={{ marginBottom: '1rem' }}>Institutional Custody & Safeguards</h4>
                 <div className="flex flex-col gap-3 text-sm" style={{ color: '#cbd5e1' }}>
@@ -555,10 +877,6 @@ export default function UserDashboard({ currentUser, onLogout, setActivePage }) 
                   <div className="flex justify-between items-center py-2 border-b border-white/5">
                     <span className="text-muted">Negative Balance Protection</span>
                     <strong className="font-mono text-success">Automated Guarantee Active</strong>
-                  </div>
-                  <div className="flex justify-between items-center py-2">
-                    <span className="text-muted">Direct Market Execution</span>
-                    <strong className="font-mono" style={{ color: 'var(--color-amber)' }}>Straight-Through Processing (STP/NDD)</strong>
                   </div>
                 </div>
               </div>
