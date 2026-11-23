@@ -31,54 +31,52 @@ export default function Home({ selectedAsset, setSelectedAsset, currentUser, onO
   // Investment / pricing tiers (Bronze / Silver / Premium)
   const pricingTiers = [
     {
-      name: 'Bronze Series',
+      name: 'Bronze',
+      subtitle: 'Investment Service',
       roi: '20%',
-      duration: '24 Hours',
-      min: '$500',
+      duration: '24 hours',
+      min: '$500.00',
       minRaw: '500',
-      max: '$10,000',
-      tag: 'FOUNDATION',
+      max: '$10,000.00',
       features: [
-        'Duration: 24 Hours Cycle',
-        'Minimum Deposit: $500',
-        'Maximum Deposit: $10,000',
-        'Automated Risk Guard',
-        '24/7 Member Desk Support',
+        'Duration 24 hours',
+        'Minimum $500.00',
+        'Maximum $10,000.00',
+        'Asset Protection',
+        'Live Support',
       ],
     },
     {
-      name: 'Silver Series',
+      name: 'Silver',
+      subtitle: 'Investment Service',
       roi: '40%',
-      duration: '48 Hours',
-      min: '$10,000',
+      duration: '48 hours',
+      min: '$10,000.00',
       minRaw: '10000',
-      max: '$50,000',
+      max: '$50,000.00',
       popular: true,
-      tag: 'ADVANCED EDGE',
       features: [
-        'Duration: 48 Hours Cycle',
-        'Minimum Deposit: $10,000',
-        'Maximum Deposit: $50,000',
-        'Priority Liquidity Routing',
-        'Dedicated Execution Manager',
-        'Daily Market Briefings',
+        'Duration 48 hours',
+        'Minimum $10,000.00',
+        'Maximum $50,000.00',
+        'Asset Protection',
+        'Live Support',
       ],
     },
     {
-      name: 'Premium Institutional',
+      name: 'Premium',
+      subtitle: 'Investment Service',
       roi: '60%',
-      duration: '72 Hours',
-      min: '$50,000',
+      duration: '72 hours',
+      min: '$50,000.00',
       minRaw: '50000',
-      max: 'Unlimited',
-      tag: 'MENTAL EDGE / VIP',
+      max: 'UNLIMITED',
       features: [
-        'Duration: 72 Hours Cycle',
-        'Minimum Deposit: $50,000',
-        'Maximum Deposit: Unlimited',
-        'Raw Institutional Liquidity',
-        'Direct Desk Mentorship',
-        'Priority Blockchain Withdrawals',
+        'Duration 72 hours',
+        'Minimum $50,000.00',
+        'Maximum UNLIMITED',
+        'Asset Protection',
+        'Live Support',
       ],
     },
   ];
@@ -427,13 +425,13 @@ export default function Home({ selectedAsset, setSelectedAsset, currentUser, onO
       {/* ═══════════════════════════════
           5. PRICING CARDS (Bronze / Silver / Premium)
       ═══════════════════════════════ */}
-      <section id="account-tiers" className="section animate-on-scroll">
-        <div className="container flex flex-col gap-8">
-          <div className="text-center" style={{ marginBottom: '1rem' }}>
-            <span className="section-label">SELECT YOUR ALLOCATION</span>
-            <h2>Institutional Series Plans</h2>
-            <p className="text-muted" style={{ marginTop: '0.5rem' }}>
-              Transparent returns with zero management or hidden carry fees.
+      <section id="account-tiers" className="section pricing-section animate-on-scroll">
+        <div className="container">
+          <div className="text-center pricing-section-header">
+            <span className="section-label">INVESTMENT PLANS</span>
+            <h2 className="pricing-section-title">Choose the best plan for your business.</h2>
+            <p className="pricing-section-desc">
+              We move, create opportunities and protect money for customers and clients worldwide
             </p>
           </div>
 
@@ -442,16 +440,19 @@ export default function Home({ selectedAsset, setSelectedAsset, currentUser, onO
               <div key={index} className={`pricing-card ${tier.popular ? 'pricing-card-popular' : ''}`}>
                 {/* Header */}
                 <div className="pricing-card-header">
-                  <div className="flex justify-between items-center" style={{ marginBottom: '0.4rem' }}>
-                    <span className="pricing-card-service font-mono">{tier.tag}</span>
-                    {tier.popular && <span className="popular-badge font-mono">MOST POPULAR</span>}
-                  </div>
+                  {tier.popular && (
+                    <div className="popular-badge-wrap">
+                      <span className="popular-badge font-mono">MOST POPULAR</span>
+                    </div>
+                  )}
                   <h3 className="pricing-card-name">{tier.name}</h3>
+                  <span className="pricing-card-service">{tier.subtitle}</span>
                 </div>
 
                 {/* ROI Number */}
-                <div className="pricing-roi font-mono">{tier.roi}</div>
-                <p className="pricing-roi-label font-mono">Target Return / {tier.duration}</p>
+                <div className="pricing-roi-block">
+                  <div className="pricing-roi font-mono">{tier.roi}</div>
+                </div>
 
                 {/* Divider */}
                 <div className="pricing-divider"></div>
@@ -459,22 +460,25 @@ export default function Home({ selectedAsset, setSelectedAsset, currentUser, onO
                 {/* Features */}
                 <ul className="pricing-features">
                   {tier.features.map((feat, fi) => (
-                    <li key={fi} className="pricing-feature-item flex items-center gap-2">
-                      <Check size={14} style={{ color: 'var(--color-amber)', flexShrink: 0 }} />
+                    <li key={fi} className="pricing-feature-item">
+                      <span className="pricing-feature-check">
+                        <Check size={14} />
+                      </span>
                       <span>{feat}</span>
                     </li>
                   ))}
                 </ul>
 
-                {/* CTA opens Deposit with prefilled plan min */}
-                <button
-                  className={`btn w-full pricing-cta ${tier.popular ? 'btn-gold' : 'btn-primary'}`}
-                  onClick={() => handlePlanClick(tier)}
-                >
-                  <Plus size={16} />
-                  <span>Get Started ({tier.min})</span>
-                </button>
-                <p className="pricing-note font-mono">*Consultation & Risk Guidance Included</p>
+                {/* Bottom CTA */}
+                <div className="pricing-bottom">
+                  <button
+                    className={`btn w-full pricing-cta ${tier.popular ? 'btn-gold' : 'btn-primary'}`}
+                    onClick={() => handlePlanClick(tier)}
+                  >
+                    <span>Get Started</span>
+                  </button>
+                  <p className="pricing-note font-mono">*Contact Us for Consultations.</p>
+                </div>
               </div>
             ))}
           </div>
@@ -941,95 +945,159 @@ export default function Home({ selectedAsset, setSelectedAsset, currentUser, onO
           line-height: 1.6;
         }
 
-        /* ---- PRICING CARDS ---- */
+        /* ---- PRICING SECTION & CARDS ---- */
+        .pricing-section {
+          padding: 5.5rem 0;
+          background-color: var(--color-bg);
+        }
+        .pricing-section-header {
+          margin-bottom: 3rem;
+        }
+        .pricing-section-title {
+          font-size: 2.25rem;
+          font-weight: 800;
+          margin-top: 0.5rem;
+          color: #ffffff;
+          letter-spacing: -0.02em;
+        }
+        .pricing-section-desc {
+          margin-top: 0.65rem;
+          font-size: 1rem;
+          color: var(--color-text-muted);
+          max-width: 620px;
+          margin-left: auto;
+          margin-right: auto;
+          line-height: 1.6;
+        }
         .pricing-grid {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
           gap: 2rem;
+          max-width: 1140px;
+          margin: 0 auto;
+          align-items: stretch;
         }
         .pricing-card {
-          background: var(--color-bg-card);
-          border: 1px solid var(--color-border);
-          border-radius: var(--radius-lg);
+          background: #11141f;
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          border-radius: 16px;
           overflow: hidden;
           display: flex;
           flex-direction: column;
-          transition: var(--transition-smooth);
+          position: relative;
+          transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
         }
         .pricing-card:hover {
-          border-color: var(--color-border-highlight);
+          border-color: rgba(255, 255, 255, 0.2);
           transform: translateY(-4px);
         }
         .pricing-card-popular {
           border-color: var(--color-amber);
-          box-shadow: 0 0 30px rgba(245, 166, 35, 0.15);
+          box-shadow: 0 0 35px rgba(245, 166, 35, 0.16);
+          background: #131724;
         }
         .pricing-card-header {
-          padding: 1.75rem 2rem 1rem;
-          border-bottom: 1px solid var(--color-border-light);
+          padding: 2.25rem 2rem 1.5rem;
+          text-align: center;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+          background: rgba(255, 255, 255, 0.02);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          position: relative;
         }
-        .pricing-card-service {
-          font-size: 0.7rem;
-          letter-spacing: 0.12em;
-          color: var(--color-amber);
-          text-transform: uppercase;
+        .popular-badge-wrap {
+          margin-bottom: 0.6rem;
         }
         .popular-badge {
           background: var(--color-amber);
           color: #090a0f;
           font-size: 0.65rem;
           font-weight: 800;
-          padding: 0.15rem 0.5rem;
-          border-radius: var(--radius-full);
-          letter-spacing: 0.05em;
+          padding: 0.2rem 0.65rem;
+          border-radius: 9999px;
+          letter-spacing: 0.06em;
+          display: inline-block;
         }
         .pricing-card-name {
-          font-size: 1.4rem;
+          font-size: 1.65rem;
           font-weight: 800;
           color: #ffffff;
-          margin-top: 0.25rem;
+          margin: 0;
+          letter-spacing: -0.01em;
+        }
+        .pricing-card-service {
+          font-size: 0.78rem;
+          letter-spacing: 0.1em;
+          color: var(--color-amber);
+          text-transform: uppercase;
+          margin-top: 0.4rem;
+          font-weight: 600;
+        }
+        .pricing-roi-block {
+          padding: 2.25rem 2rem 0;
+          text-align: center;
         }
         .pricing-roi {
-          font-size: 3.2rem;
+          font-size: 3.75rem;
           font-weight: 800;
           color: var(--color-amber);
-          text-align: center;
-          padding: 1.25rem 2rem 0;
           line-height: 1;
-        }
-        .pricing-roi-label {
-          text-align: center;
-          font-size: 0.72rem;
-          color: var(--color-text-muted);
-          text-transform: uppercase;
-          letter-spacing: 0.08em;
-          padding: 0.4rem 2rem 0;
+          letter-spacing: -0.02em;
         }
         .pricing-divider {
           height: 1px;
-          background: var(--color-border);
-          margin: 1.25rem 2rem;
+          background: rgba(255, 255, 255, 0.06);
+          margin: 1.75rem 2rem;
         }
         .pricing-features {
           list-style: none;
           padding: 0 2rem;
           display: flex;
           flex-direction: column;
-          gap: 0.75rem;
+          gap: 1rem;
           flex: 1;
         }
         .pricing-feature-item {
-          font-size: 0.85rem;
-          color: var(--color-text-body);
+          display: flex;
+          align-items: center;
+          gap: 0.85rem;
+          font-size: 0.9rem;
+          color: #cbd5e1;
+          line-height: 1.4;
+        }
+        .pricing-feature-check {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 18px;
+          height: 18px;
+          border-radius: 4px;
+          background: rgba(245, 166, 35, 0.12);
+          color: var(--color-amber);
+          flex-shrink: 0;
+        }
+        .pricing-bottom {
+          padding: 2rem 2rem 1.75rem;
+          margin-top: auto;
         }
         .pricing-cta {
-          margin: 1.75rem 2rem 0.5rem;
+          width: 100%;
+          padding: 0.85rem 1.5rem;
+          border-radius: 9999px;
+          font-weight: 700;
+          font-size: 0.95rem;
+          letter-spacing: 0.01em;
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
         .pricing-note {
           text-align: center;
-          font-size: 0.7rem;
-          color: var(--color-text-dim);
-          padding: 0 2rem 1.5rem;
+          font-size: 0.72rem;
+          color: #64748b;
+          margin-top: 0.85rem;
+          letter-spacing: 0.02em;
         }
 
         /* ---- FUNDING (Deposit & Withdrawal) SECTION ---- */
