@@ -178,7 +178,7 @@ export default function MarketTable({ onSelectAsset }) {
           font-weight: 700;
         }
         .search-container {
-          background-color: var(--color-white);
+          background-color: rgba(255, 255, 255, 0.04);
           border: 1px solid var(--color-border);
           border-radius: var(--radius-md);
           padding: 0.5rem 1rem;
@@ -195,7 +195,7 @@ export default function MarketTable({ onSelectAsset }) {
           outline: none;
           width: 100%;
           font-size: 0.9rem;
-          color: var(--color-text-dark);
+          color: #ffffff;
           background: transparent;
         }
         .tabs-container {
@@ -218,15 +218,15 @@ export default function MarketTable({ onSelectAsset }) {
           transition: var(--transition-fast);
         }
         .tab-btn:hover {
-          color: var(--color-blue-royal);
+          color: var(--color-amber);
         }
         .tab-btn.active {
-          color: var(--color-blue-royal);
-          border-bottom-color: var(--color-gold);
+          color: var(--color-amber);
+          border-bottom-color: var(--color-amber);
         }
         .asset-symbol {
           font-weight: 700;
-          color: var(--color-blue-deep);
+          color: #ffffff;
         }
         .asset-name {
           font-size: 0.8rem;
@@ -254,8 +254,8 @@ export default function MarketTable({ onSelectAsset }) {
           border-radius: var(--radius-sm);
         }
         .btn-trade-action:hover {
-          background-color: var(--color-gold);
-          color: var(--color-white);
+          background-color: var(--color-amber);
+          color: #090a0f;
         }
         .font-mono {
           font-family: monospace;

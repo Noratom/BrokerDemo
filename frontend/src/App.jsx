@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import LiveTicker from './components/LiveTicker';
+import DepositWithdrawModal from './components/DepositWithdrawModal';
 import Home from './pages/Home';
 import About from './pages/About';
 import AdminDashboard from './pages/AdminDashboard';
@@ -18,6 +19,21 @@ function App() {
     const saved = localStorage.getItem('aura_current_user');
     return saved ? JSON.parse(saved) : null;
   });
+  const [fundingModal, setFundingModal] = useState({ isOpen: false, tab: 'deposit', amount: '' });
+
+  const handleOpenFunding = (tab = 'deposit', amount = '') => {
+    setFundingModal({ isOpen: true, tab, amount });
+  };
+
+  const handleBalanceUpdate = (newBalance) => {
+    if (currentUser) {
+      setCurrentUser(prev => {
+        const updated = { ...prev, balance: newBalance };
+        localStorage.setItem('aura_current_user', JSON.stringify(updated));
+        return updated;
+      });
+    }
+  };
 
   // Keep client profile/balance in sync with backend server in real-time
   useEffect(() => {
@@ -83,6 +99,7 @@ function App() {
             setSelectedAsset={setSelectedAsset} 
             currentUser={currentUser}
             onOpenAuth={() => setActivePage('login')}
+            onOpenFunding={handleOpenFunding}
           />
         );
       case 'about':
@@ -189,6 +206,7 @@ function App() {
             setSelectedAsset={setSelectedAsset} 
             currentUser={currentUser}
             onOpenAuth={() => setActivePage('login')}
+            onOpenFunding={handleOpenFunding}
           />
         );
     }
@@ -206,12 +224,24 @@ function App() {
         currentUser={currentUser}
         onLogout={handleLogout}
         onOpenAuth={() => setActivePage('login')}
+        onOpenFunding={handleOpenFunding}
       />
 
       {/* Content Injection */}
       <main style={{ flexGrow: 1 }}>
         {renderContent()}
       </main>
+
+      {/* Global Deposit / Withdraw Modal */}
+      <DepositWithdrawModal
+        isOpen={fundingModal.isOpen}
+        onClose={() => setFundingModal({ ...fundingModal, isOpen: false })}
+        initialTab={fundingModal.tab}
+        initialAmount={fundingModal.amount}
+        currentUser={currentUser}
+        onBalanceUpdate={handleBalanceUpdate}
+        onOpenAuth={() => { setFundingModal({ ...fundingModal, isOpen: false }); setActivePage('login'); }}
+      />
 
       {/* Footer Disclaimer & Links */}
       <Footer setActivePage={setActivePage} />

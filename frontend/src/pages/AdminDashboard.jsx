@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Users, BarChart3, Settings, MessageSquare, Shield, DollarSign, TrendingUp, Activity, Search, Edit3, Check, X, RefreshCw } from 'lucide-react';
+import { Users, BarChart3, Settings, MessageSquare, Shield, DollarSign, TrendingUp, Activity, Search, Edit3, Check, X, RefreshCw, CreditCard, ArrowDownLeft, ArrowUpRight } from 'lucide-react';
 import { API_BASE_URL } from '../config';
 
 export default function AdminDashboard({ currentUser, onLogout, setActivePage }) {
@@ -14,6 +14,7 @@ export default function AdminDashboard({ currentUser, onLogout, setActivePage })
   const [overridePrice, setOverridePrice] = useState('');
   const [notification, setNotification] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [transactions, setTransactions] = useState([]);
 
   useEffect(() => {
     fetchAll();
@@ -23,7 +24,7 @@ export default function AdminDashboard({ currentUser, onLogout, setActivePage })
 
   const fetchAll = async () => {
     try {
-      const [uRes, tRes, mRes, cRes] = await Promise.all([
+      const [uRes, tRes, mRes, cRes, txRes] = await Promise.all([
         fetch(`${API_BASE_URL}/api/admin/users`),
         fetch(`${API_BASE_URL}/api/admin/trades`),
         fetch(`${API_BASE_URL}/api/markets`),
@@ -33,6 +34,7 @@ export default function AdminDashboard({ currentUser, onLogout, setActivePage })
       if (tRes.ok) { const r = await tRes.json(); setAllTrades(r.data); }
       if (mRes.ok) { const r = await mRes.json(); setMarkets(r.data); }
       if (cRes.ok) { const r = await cRes.json(); setMessages(r.data); }
+      if (txRes && txRes.ok) { const r = await txRes.json(); setTransactions(r.data); }
     } catch (e) {}
   };
 
@@ -58,6 +60,22 @@ export default function AdminDashboard({ currentUser, onLogout, setActivePage })
     }
   };
 
+    const handleUpdateTxStatus = async (txId, status) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/transactions/${txId}/status`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status })
+      });
+      if (response.ok) {
+        showNotif('success', `Transaction ${status} successfully.`);
+        fetchAll();
+      }
+    } catch (e) {
+      showNotif('error', 'Failed to update transaction status.');
+    }
+  };
+
   const handlePriceOverride = async () => {
     if (!overridePrice) return;
     try {
@@ -79,6 +97,7 @@ export default function AdminDashboard({ currentUser, onLogout, setActivePage })
   const sidebarItems = [
     { id: 'users', label: 'User Management', icon: Users },
     { id: 'trades', label: 'Trade Ledger', icon: BarChart3 },
+    { id: 'funding', label: 'Funding Requests', icon: CreditCard },
     { id: 'markets', label: 'Market Control', icon: TrendingUp },
     { id: 'messages', label: 'Support Inbox', icon: MessageSquare },
   ];
@@ -174,6 +193,111 @@ export default function AdminDashboard({ currentUser, onLogout, setActivePage })
           </div>
 
           {/* Tab Content */}
+
+          {/* Funding Requests Tab */}
+          {activeTab === 'funding' && (
+            <div className="page-enter">
+              <div className="flex justify-between items-center" style={{ marginBottom: '1.5rem' }}>
+                <div>
+                  <h2>Funding & Settlement Requests</h2>
+                  <p className="text-muted text-sm">Review deposits and withdrawal authorizations across crypto and wire rails.</p>
+                </div>
+                <button className="btn btn-secondary btn-sm flex items-center gap-2" onClick={fetchAll}>
+                  <RefreshCw size={14} /> Refresh
+                </button>
+              </div>
+
+              <div className="table-container">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Type</th>
+                      <th>User</th>
+                      <th>Amount</th>
+                      <th>Method</th>
+                      <th>Reference / TxID</th>
+                      <th>Timestamp</th>
+                      <th>Status</th>
+                      <th style={{ textAlign: 'right' }}>Authorization</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {transactions && transactions.length > 0 ? (
+                      transactions.map(tx => {
+                        const isDeposit = tx.type === 'DEPOSIT';
+                        return (
+                          <tr key={tx.id}>
+                            <td>
+                              <span className={`flex items-center gap-1 font-mono text-xs ${isDeposit ? 'text-success' : 'text-danger'}`} style={{ fontWeight: 700 }}>
+                                {isDeposit ? <ArrowDownLeft size={14} /> : <ArrowUpRight size={14} />}
+                                {tx.type}
+                              </span>
+                            </td>
+                            <td>
+                              <div>
+                                <div className="font-label" style={{ fontSize: '0.88rem' }}>{tx.userName || 'Client'}</div>
+                                <div className="text-xs text-muted font-mono">{tx.userEmail || tx.userId}</div>
+                              </div>
+                            </td>
+                            <td className="font-mono" style={{ fontWeight: 700 }}>
+                              ${Number(tx.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                            </td>
+                            <td>
+                              <span className="type-tag" style={{ background: 'rgba(255,255,255,0.06)', color: 'var(--color-amber)', border: '1px solid var(--color-border)' }}>
+                                {tx.method}
+                              </span>
+                            </td>
+                            <td className="font-mono text-xs text-muted" style={{ maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              {tx.reference || tx.destination || 'N/A'}
+                            </td>
+                            <td className="font-mono text-xs text-muted">
+                              {new Date(tx.timestamp).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                            </td>
+                            <td>
+                              <span className={`type-tag ${(tx.status.toLowerCase() === 'approved' || tx.status.toLowerCase() === 'completed') ? 'tag-buy' : tx.status.toLowerCase() === 'rejected' ? 'tag-sell' : ''}`} style={tx.status.toLowerCase() === 'pending' ? { background: 'rgba(245,166,35,0.15)', color: 'var(--color-amber)' } : {}}>
+                                {tx.status.toUpperCase()}
+                              </span>
+                            </td>
+                            <td style={{ textAlign: 'right' }}>
+                              {tx.status.toLowerCase() === 'pending' ? (
+                                <div className="flex items-center justify-end gap-2">
+                                  <button
+                                    className="btn btn-sm"
+                                    style={{ background: '#10b981', color: '#fff', padding: '0.35rem 0.65rem' }}
+                                    onClick={() => handleUpdateTxStatus(tx.id, 'approved')}
+                                    title="Approve Transaction"
+                                  >
+                                    <Check size={14} /> Approve
+                                  </button>
+                                  <button
+                                    className="btn btn-sm"
+                                    style={{ background: '#ef4444', color: '#fff', padding: '0.35rem 0.65rem' }}
+                                    onClick={() => handleUpdateTxStatus(tx.id, 'rejected')}
+                                    title="Reject Transaction"
+                                  >
+                                    <X size={14} /> Reject
+                                  </button>
+                                </div>
+                              ) : (
+                                <span className="text-xs text-muted font-mono">Processed</span>
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })
+                    ) : (
+                      <tr>
+                        <td colSpan="8" className="text-center text-muted" style={{ padding: '3rem' }}>
+                          No deposit or withdrawal transactions on record.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
           {activeTab === 'users' && (
             <div className="page-enter">
               <div className="flex justify-between items-center" style={{ marginBottom: '1.5rem' }}>
@@ -319,13 +443,13 @@ export default function AdminDashboard({ currentUser, onLogout, setActivePage })
 
       <style>{`
         .admin-dash { min-height: 100vh; background: var(--color-bg); }
-        .admin-sidebar { background: var(--color-blue-deep) !important; border-right: none !important; }
+        .admin-sidebar { background: #0e1017 !important; border-right: 1px solid var(--color-border) !important; }
         .admin-sidebar .dash-sidebar-profile { border-bottom-color: rgba(255,255,255,0.1); }
         .admin-sidebar .dash-user-name { color: var(--color-white); }
         .admin-sidebar .dash-sidebar-profile .text-muted { color: rgba(255,255,255,0.5) !important; }
         .admin-avatar {
-          background: linear-gradient(135deg, var(--color-gold), var(--color-gold-bright)) !important;
-          color: var(--color-blue-deep) !important;
+          background: linear-gradient(135deg, var(--color-amber), #ffb800) !important;
+          color: #090a0f !important;
         }
         .admin-sidebar .dash-nav-btn {
           color: rgba(255,255,255,0.6);
@@ -337,7 +461,7 @@ export default function AdminDashboard({ currentUser, onLogout, setActivePage })
         .admin-sidebar .dash-nav-btn.active {
           background: rgba(255,255,255,0.12);
           color: var(--color-white);
-          border-left: 3px solid var(--color-gold-bright);
+          border-left: 3px solid var(--color-amber);
         }
         .admin-sidebar .dash-sidebar-actions { border-top-color: rgba(255,255,255,0.1); }
         .admin-sidebar .logout-btn:hover { background: rgba(239,68,68,0.15) !important; color: #fca5a5 !important; }

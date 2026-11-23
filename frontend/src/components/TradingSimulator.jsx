@@ -374,12 +374,12 @@ export default function TradingSimulator({ selectedAsset, setSelectedAsset, curr
 
                 <defs>
                   <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="var(--color-blue-royal)" stopOpacity="0.15" />
-                    <stop offset="100%" stopColor="var(--color-blue-royal)" stopOpacity="0.0" />
+                    <stop offset="0%" stopColor="#f5a623" stopOpacity="0.15" />
+                    <stop offset="100%" stopColor="#f5a623" stopOpacity="0.0" />
                   </linearGradient>
                 </defs>
                 <polygon points={areaPoints} fill="url(#chartGradient)" />
-                <polyline fill="none" stroke="var(--color-blue-royal)" strokeWidth={2.5} points={points} />
+                <polyline fill="none" stroke="#f5a623" strokeWidth={2.5} points={points} />
 
                 {chartData.length > 0 && (() => {
                   const lastIdx = chartData.length - 1;
@@ -391,7 +391,7 @@ export default function TradingSimulator({ selectedAsset, setSelectedAsset, curr
                       cx={cxVal}
                       cy={cyVal}
                       r={5}
-                      fill="var(--color-gold-bright)"
+                      fill="#f5a623"
                       className="live-pulse-circle"
                     />
                   );
@@ -602,7 +602,7 @@ export default function TradingSimulator({ selectedAsset, setSelectedAsset, curr
         }
         .live-badge {
           font-size: 0.75rem;
-          background-color: var(--color-gold-light);
+          background-color: rgba(245, 166, 35, 0.15);
           color: var(--color-gold);
           border: 1px solid var(--color-gold-border);
           padding: 0.15rem 0.5rem;
@@ -627,7 +627,7 @@ export default function TradingSimulator({ selectedAsset, setSelectedAsset, curr
         .chart-price-display {
           font-size: 2.25rem;
           font-weight: 700;
-          color: var(--color-blue-deep);
+          color: #ffffff;
         }
         .svg-chart-container {
           flex-grow: 1;
@@ -660,16 +660,16 @@ export default function TradingSimulator({ selectedAsset, setSelectedAsset, curr
           justify-content: center;
         }
         .stat-icon-wrapper.bg-blue {
-          background-color: var(--color-blue-soft);
+          background-color: rgba(245, 166, 35, 0.12);
         }
         .stat-icon-wrapper.bg-gold {
           background-color: var(--color-gold-light);
         }
         .stat-icon-wrapper.bg-light {
-          background-color: var(--color-bg-alt);
+          background-color: rgba(255, 255, 255, 0.05);
         }
         .color-blue {
-          color: var(--color-blue-primary);
+          color: var(--color-amber);
         }
         .color-gold {
           color: var(--color-gold);
@@ -690,7 +690,7 @@ export default function TradingSimulator({ selectedAsset, setSelectedAsset, curr
           font-weight: 700;
         }
         .margin-summary-card {
-          background-color: var(--color-bg);
+          background-color: rgba(255, 255, 255, 0.03);
           border: 1px solid var(--color-border-light);
           padding: 0.75rem;
           border-radius: var(--radius-md);

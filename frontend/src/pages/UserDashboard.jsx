@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { LayoutDashboard, Briefcase, Clock, Star, TrendingUp, DollarSign, ArrowUpRight, ArrowDownRight, Activity, LogOut, Settings } from 'lucide-react';
+import {
+  LayoutDashboard, Briefcase, Clock, Star, TrendingUp, DollarSign,
+  ArrowUpRight, ArrowDownRight, Activity, LogOut, Wallet,
+  ArrowDownCircle, ArrowUpCircle, ShieldCheck, CheckCircle2, AlertCircle, Plus
+} from 'lucide-react';
 import { API_BASE_URL } from '../config';
+import DepositWithdrawModal from '../components/DepositWithdrawModal';
 
 export default function UserDashboard({ currentUser, onLogout, setActivePage }) {
   const [activeTab, setActiveTab] = useState('overview');
@@ -10,16 +15,42 @@ export default function UserDashboard({ currentUser, onLogout, setActivePage }) 
     const saved = localStorage.getItem('aura_watchlist');
     return saved ? JSON.parse(saved) : ['EUR/USD', 'BTC/USD', 'GOLD'];
   });
+  const [transactions, setTransactions] = useState(() => {
+    const saved = localStorage.getItem('aura_transactions');
+    return saved ? JSON.parse(saved) : [
+      {
+        id: 'DEP-8921B',
+        type: 'DEPOSIT',
+        method: 'USDT (TRC20)',
+        amount: 10000,
+        status: 'COMPLETED',
+        timestamp: new Date(Date.now() - 86400000 * 3).toISOString()
+      }
+    ];
+  });
 
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalTab, setModalTab] = useState('deposit');
+  const [modalAmount, setModalAmount] = useState('');
+
+  // Fetch live market data and positions
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [posRes, mkRes] = await Promise.all([
+        const [posRes, mkRes, txRes] = await Promise.all([
           fetch(`${API_BASE_URL}/api/trades/${currentUser.id}`),
-          fetch(`${API_BASE_URL}/api/markets`)
+          fetch(`${API_BASE_URL}/api/markets`),
+          fetch(`${API_BASE_URL}/api/wallet/transactions/${currentUser.id}`)
         ]);
         if (posRes.ok) { const r = await posRes.json(); setPositions(r.data); }
         if (mkRes.ok) { const r = await mkRes.json(); setMarkets(r.data); }
+        if (txRes.ok) {
+          const r = await txRes.json();
+          if (r.data && r.data.length > 0) {
+            setTransactions(r.data);
+            localStorage.setItem('aura_transactions', JSON.stringify(r.data));
+          }
+        }
       } catch (e) {}
     };
     fetchData();
@@ -35,6 +66,19 @@ export default function UserDashboard({ currentUser, onLogout, setActivePage }) 
     setWatchlist(prev => prev.includes(symbol) ? prev.filter(s => s !== symbol) : [...prev, symbol]);
   };
 
+  const handleOpenFunding = (tab, amount = '') => {
+    setModalTab(tab);
+    setModalAmount(amount);
+    setModalOpen(true);
+  };
+
+  const handleBalanceUpdate = (newBalance) => {
+    currentUser.balance = newBalance;
+    localStorage.setItem('aura_current_user', JSON.stringify(currentUser));
+    const saved = localStorage.getItem('aura_transactions');
+    if (saved) setTransactions(JSON.parse(saved));
+  };
+
   const totalPL = positions.reduce((acc, p) => {
     const market = markets.find(m => m.symbol === p.symbol);
     if (!market) return acc;
@@ -48,6 +92,7 @@ export default function UserDashboard({ currentUser, onLogout, setActivePage }) 
 
   const sidebarItems = [
     { id: 'overview', label: 'Overview', icon: LayoutDashboard },
+    { id: 'wallet', label: 'Deposit & Withdraw', icon: Wallet },
     { id: 'positions', label: 'Open Positions', icon: Briefcase },
     { id: 'watchlist', label: 'Watchlist', icon: Star },
     { id: 'history', label: 'Trade History', icon: Clock },
@@ -61,7 +106,7 @@ export default function UserDashboard({ currentUser, onLogout, setActivePage }) 
     positionsByAsset[p.symbol] = (positionsByAsset[p.symbol] || 0) + val;
   });
   const totalExposure = Object.values(positionsByAsset).reduce((a, b) => a + b, 0) || 1;
-  const colors = ['#1e40af', '#c9981a', '#10b981', '#ef4444', '#8b5cf6', '#ec4899', '#f97316'];
+  const colors = ['#1a3edb', '#2340e0', '#10b981', '#ef4444', '#8b5cf6', '#ec4899', '#f97316'];
 
   let cumulativePercent = 0;
   const slices = Object.entries(positionsByAsset).map(([symbol, val], i) => {
@@ -98,7 +143,11 @@ export default function UserDashboard({ currentUser, onLogout, setActivePage }) 
             {sidebarItems.map(item => {
               const Icon = item.icon;
               return (
-                <button key={item.id} className={`dash-nav-btn ${activeTab === item.id ? 'active' : ''}`} onClick={() => setActiveTab(item.id)}>
+                <button
+                  key={item.id}
+                  className={`dash-nav-btn ${activeTab === item.id ? 'active' : ''}`}
+                  onClick={() => setActiveTab(item.id)}
+                >
                   <Icon size={18} />
                   <span>{item.label}</span>
                 </button>
@@ -120,44 +169,72 @@ export default function UserDashboard({ currentUser, onLogout, setActivePage }) 
 
         {/* Main Content */}
         <main className="dash-main">
+          {/* ══════════ TAB: OVERVIEW ══════════ */}
           {activeTab === 'overview' && (
             <div className="page-enter">
-              <h2 style={{ marginBottom: '0.25rem' }}>Portfolio Overview</h2>
-              <p className="text-muted text-sm" style={{ marginBottom: '2rem' }}>Welcome back, {currentUser.name.split(' ')[0]}.</p>
+              <div className="flex justify-between items-center flex-wrap gap-4" style={{ marginBottom: '1.5rem' }}>
+                <div>
+                  <h2 style={{ marginBottom: '0.25rem' }}>Portfolio Overview</h2>
+                  <p className="text-muted text-sm">Welcome back, {currentUser.name.split(' ')[0]}. Here is your current financial summary.</p>
+                </div>
+                <div className="flex gap-2">
+                  <button className="btn btn-primary btn-sm flex items-center gap-2" onClick={() => handleOpenFunding('deposit')}>
+                    <ArrowDownCircle size={16} />
+                    <span>Deposit</span>
+                  </button>
+                  <button className="btn btn-secondary btn-sm flex items-center gap-2" onClick={() => handleOpenFunding('withdraw')}>
+                    <ArrowUpCircle size={16} />
+                    <span>Withdraw</span>
+                  </button>
+                </div>
+              </div>
 
               <div className="grid grid-cols-4 gap-6" style={{ marginBottom: '2.5rem' }}>
                 <div className="card card-static dash-metric">
-                  <div className="dash-metric-icon" style={{ background: 'var(--color-blue-soft)' }}><DollarSign size={20} style={{ color: 'var(--color-blue-royal)' }} /></div>
-                  <span className="text-xs text-muted uppercase font-label">Balance</span>
-                  <h3 className="font-mono" style={{ fontSize: '1.4rem' }}>${currentUser.balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}</h3>
+                  <div className="dash-metric-icon" style={{ background: '#eef2ff' }}>
+                    <DollarSign size={20} style={{ color: '#1a3edb' }} />
+                  </div>
+                  <span className="text-xs text-muted uppercase font-label">Account Balance</span>
+                  <h3 className="font-mono" style={{ fontSize: '1.4rem', color: '#111827' }}>
+                    ${currentUser.balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                  </h3>
                 </div>
+
                 <div className="card card-static dash-metric">
-                  <div className="dash-metric-icon" style={{ background: 'var(--color-gold-light)' }}><TrendingUp size={20} style={{ color: 'var(--color-gold)' }} /></div>
-                  <span className="text-xs text-muted uppercase font-label">Equity</span>
-                  <h3 className="font-mono" style={{ fontSize: '1.4rem' }}>${equity.toLocaleString(undefined, { minimumFractionDigits: 2 })}</h3>
+                  <div className="dash-metric-icon" style={{ background: '#f0f4ff' }}>
+                    <TrendingUp size={20} style={{ color: '#1a3edb' }} />
+                  </div>
+                  <span className="text-xs text-muted uppercase font-label">Net Equity</span>
+                  <h3 className="font-mono" style={{ fontSize: '1.4rem', color: '#111827' }}>
+                    ${equity.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                  </h3>
                 </div>
+
                 <div className="card card-static dash-metric">
-                  <div className="dash-metric-icon" style={{ background: totalPL >= 0 ? 'var(--color-success-bg)' : 'var(--color-danger-bg)' }}>
-                    {totalPL >= 0 ? <ArrowUpRight size={20} style={{ color: 'var(--color-success)' }} /> : <ArrowDownRight size={20} style={{ color: 'var(--color-danger)' }} />}
+                  <div className="dash-metric-icon" style={{ background: totalPL >= 0 ? '#ecfdf5' : '#fef2f2' }}>
+                    {totalPL >= 0 ? <ArrowUpRight size={20} style={{ color: '#10b981' }} /> : <ArrowDownRight size={20} style={{ color: '#ef4444' }} />}
                   </div>
                   <span className="text-xs text-muted uppercase font-label">Floating P/L</span>
                   <h3 className={`font-mono ${totalPL >= 0 ? 'text-success' : 'text-danger'}`} style={{ fontSize: '1.4rem' }}>
                     {totalPL >= 0 ? '+' : ''}${totalPL.toFixed(2)}
                   </h3>
                 </div>
+
                 <div className="card card-static dash-metric">
-                  <div className="dash-metric-icon" style={{ background: 'var(--color-blue-mist)' }}><Briefcase size={20} style={{ color: 'var(--color-blue-deep)' }} /></div>
+                  <div className="dash-metric-icon" style={{ background: '#f8fafc' }}>
+                    <Briefcase size={20} style={{ color: '#0d1b2a' }} />
+                  </div>
                   <span className="text-xs text-muted uppercase font-label">Open Trades</span>
                   <h3 className="font-mono" style={{ fontSize: '1.4rem' }}>{positions.length}</h3>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-8">
-                {/* Donut Chart */}
+                {/* Exposure Breakdown */}
                 <div className="card card-static">
                   <h4 style={{ marginBottom: '1.25rem' }}>Exposure Breakdown</h4>
                   {slices.length > 0 ? (
-                    <div className="flex items-center gap-8">
+                    <div className="flex items-center gap-8 flex-wrap">
                       <svg viewBox="0 0 100 100" style={{ width: '140px', height: '140px' }}>
                         {slices.map((s, i) => <path key={i} d={s.d} fill={s.color} stroke="white" strokeWidth="1" />)}
                         <circle cx="50" cy="50" r="22" fill="white" />
@@ -185,7 +262,7 @@ export default function UserDashboard({ currentUser, onLogout, setActivePage }) 
                       <div key={m.symbol} className="flex justify-between items-center watchlist-row">
                         <div className="flex items-center gap-3">
                           <button className="star-btn active" onClick={() => toggleWatchlist(m.symbol)}>
-                            <Star size={14} fill="var(--color-gold)" />
+                            <Star size={14} fill="#1a3edb" />
                           </button>
                           <div>
                             <div className="font-label text-sm">{m.symbol}</div>
@@ -207,6 +284,115 @@ export default function UserDashboard({ currentUser, onLogout, setActivePage }) 
             </div>
           )}
 
+          {/* ══════════ TAB: DEPOSIT & WITHDRAW ══════════ */}
+          {activeTab === 'wallet' && (
+            <div className="page-enter">
+              <div className="flex justify-between items-center flex-wrap gap-4" style={{ marginBottom: '2rem' }}>
+                <div>
+                  <h2 style={{ marginBottom: '0.25rem' }}>Deposit & Withdrawal Center</h2>
+                  <p className="text-muted text-sm">Manage your funds, initiate deposits, and request fast withdrawals.</p>
+                </div>
+                <div className="flex gap-3">
+                  <button className="btn btn-primary flex items-center gap-2" onClick={() => handleOpenFunding('deposit')}>
+                    <ArrowDownCircle size={18} />
+                    <span>Make a Deposit</span>
+                  </button>
+                  <button className="btn btn-secondary flex items-center gap-2" onClick={() => handleOpenFunding('withdraw')}>
+                    <ArrowUpCircle size={18} />
+                    <span>Withdraw Funds</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Wallet Cards */}
+              <div className="grid grid-cols-3 gap-6" style={{ marginBottom: '2rem' }}>
+                <div className="card card-static">
+                  <span className="text-xs text-muted font-label uppercase">Total Balance</span>
+                  <h3 className="font-mono" style={{ fontSize: '1.6rem', color: '#1a3edb', marginTop: '0.35rem' }}>
+                    ${currentUser.balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                  </h3>
+                  <p className="text-xs text-muted" style={{ marginTop: '0.35rem' }}>Available for trading or immediate withdrawal</p>
+                </div>
+
+                <div className="card card-static">
+                  <span className="text-xs text-muted font-label uppercase">Deposit Methods</span>
+                  <div className="flex items-center gap-2" style={{ marginTop: '0.5rem' }}>
+                    <span className="badge badge-blue text-xs">USDT</span>
+                    <span className="badge badge-blue text-xs">BTC</span>
+                    <span className="badge badge-blue text-xs">ETH</span>
+                    <span className="badge badge-blue text-xs">Bank Wire</span>
+                  </div>
+                  <p className="text-xs text-muted" style={{ marginTop: '0.5rem' }}>0% deposit fee on all crypto & wire channels</p>
+                </div>
+
+                <div className="card card-static">
+                  <span className="text-xs text-muted font-label uppercase">Security Status</span>
+                  <div className="flex items-center gap-2 text-success" style={{ marginTop: '0.5rem', fontWeight: 700 }}>
+                    <ShieldCheck size={18} />
+                    <span>Funds Segregated & Insured</span>
+                  </div>
+                  <p className="text-xs text-muted" style={{ marginTop: '0.35rem' }}>256-bit bank grade encryption</p>
+                </div>
+              </div>
+
+              {/* Transaction History Ledger */}
+              <div className="card card-static">
+                <div className="flex justify-between items-center" style={{ marginBottom: '1.25rem' }}>
+                  <h3 style={{ fontSize: '1.15rem', fontWeight: 700 }}>Funding Transactions</h3>
+                  <span className="text-xs text-muted">{transactions.length} record(s)</span>
+                </div>
+
+                <div className="table-container">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Reference ID</th>
+                        <th>Type</th>
+                        <th>Method</th>
+                        <th>Amount</th>
+                        <th>Date & Time</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {transactions.length > 0 ? (
+                        transactions.map((tx) => (
+                          <tr key={tx.id}>
+                            <td className="font-mono text-xs">{tx.id}</td>
+                            <td>
+                              <span className={`type-badge ${tx.type === 'DEPOSIT' ? 'badge-buy' : 'badge-sell'}`}>
+                                {tx.type}
+                              </span>
+                            </td>
+                            <td className="font-label text-sm">{tx.method}</td>
+                            <td className="font-mono" style={{ fontWeight: 700 }}>
+                              {tx.type === 'DEPOSIT' ? '+' : '-'}${Number(tx.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                            </td>
+                            <td className="text-xs text-muted">
+                              {new Date(tx.timestamp).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })}
+                            </td>
+                            <td>
+                              <span className={`badge ${tx.status === 'COMPLETED' ? 'badge-blue' : 'badge-gold'}`} style={{ fontSize: '0.72rem' }}>
+                                {tx.status}
+                              </span>
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan="6" className="text-center text-muted" style={{ padding: '2.5rem' }}>
+                            No funding records yet. Click "Make a Deposit" above to fund your account.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ══════════ TAB: OPEN POSITIONS ══════════ */}
           {activeTab === 'positions' && (
             <div className="page-enter">
               <h2 style={{ marginBottom: '2rem' }}>Open Positions ({positions.length})</h2>
@@ -243,6 +429,7 @@ export default function UserDashboard({ currentUser, onLogout, setActivePage }) 
             </div>
           )}
 
+          {/* ══════════ TAB: WATCHLIST ══════════ */}
           {activeTab === 'watchlist' && (
             <div className="page-enter">
               <h2 style={{ marginBottom: '0.5rem' }}>Market Watchlist</h2>
@@ -254,7 +441,7 @@ export default function UserDashboard({ currentUser, onLogout, setActivePage }) 
                     <div key={m.symbol} className="card card-static flex justify-between items-center" style={{ padding: '1.25rem' }}>
                       <div className="flex items-center gap-3">
                         <button className={`star-btn ${isWatched ? 'active' : ''}`} onClick={() => toggleWatchlist(m.symbol)}>
-                          <Star size={18} fill={isWatched ? 'var(--color-gold)' : 'none'} />
+                          <Star size={18} fill={isWatched ? '#1a3edb' : 'none'} />
                         </button>
                         <div>
                           <div className="font-label">{m.symbol}</div>
@@ -274,6 +461,7 @@ export default function UserDashboard({ currentUser, onLogout, setActivePage }) 
             </div>
           )}
 
+          {/* ══════════ TAB: TRADE HISTORY ══════════ */}
           {activeTab === 'history' && (
             <div className="page-enter">
               <h2 style={{ marginBottom: '2rem' }}>Trade History</h2>
@@ -282,6 +470,16 @@ export default function UserDashboard({ currentUser, onLogout, setActivePage }) 
           )}
         </main>
       </div>
+
+      {/* Global Deposit/Withdraw Modal */}
+      <DepositWithdrawModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        initialTab={modalTab}
+        initialAmount={modalAmount}
+        currentUser={currentUser}
+        onBalanceUpdate={handleBalanceUpdate}
+      />
 
       <style>{`
         .user-dash { min-height: 100vh; background: var(--color-bg); }
@@ -308,43 +506,37 @@ export default function UserDashboard({ currentUser, onLogout, setActivePage }) 
         .dash-avatar {
           width: 40px; height: 40px;
           border-radius: var(--radius-md);
-          background: linear-gradient(135deg, var(--color-blue-royal), var(--color-blue-primary));
-          color: white;
+          background: #1a3edb;
+          color: #ffffff;
           display: flex; align-items: center; justify-content: center;
-          font-weight: 800; font-size: 1.1rem;
+          font-weight: 700; font-size: 1.1rem;
         }
-        .dash-user-name { font-weight: 700; font-size: 0.95rem; color: var(--color-blue-deep); }
-        .dash-nav { display: flex; flex-direction: column; gap: 0.25rem; flex-grow: 1; }
+        .dash-user-name { font-weight: 700; color: #111827; }
+        .dash-nav { display: flex; flex-direction: column; gap: 0.4rem; flex: 1; }
         .dash-nav-btn {
           display: flex; align-items: center; gap: 0.75rem;
-          background: none; border: none; cursor: pointer;
-          padding: 0.7rem 0.75rem; border-radius: var(--radius-sm);
-          font-size: 0.9rem; font-weight: 500;
-          color: var(--color-text-muted);
-          transition: var(--transition-fast);
-          width: 100%; text-align: left;
+          padding: 0.8rem 1rem; border-radius: var(--radius-md);
+          border: none; background: none; color: var(--color-text-muted);
+          font-weight: 600; font-size: 0.9rem; cursor: pointer;
+          transition: var(--transition-fast); text-align: left; width: 100%;
         }
-        .dash-nav-btn:hover { background: var(--color-blue-mist); color: var(--color-blue-deep); }
+        .dash-nav-btn:hover { background: #f0f4ff; color: #1a3edb; }
         .dash-nav-btn.active {
-          background: var(--color-blue-soft);
-          color: var(--color-blue-royal);
-          font-weight: 700;
+          background: #1a3edb;
+          color: #ffffff;
+          box-shadow: 0 4px 14px rgba(26, 62, 219, 0.25);
         }
-        .dash-nav-btn.logout-btn:hover { background: var(--color-danger-bg); color: var(--color-danger); }
         .dash-sidebar-actions {
           border-top: 1px solid var(--color-border-light);
-          padding-top: 1rem;
-          display: flex;
-          flex-direction: column;
-          gap: 0.25rem;
+          padding-top: 1rem; display: flex; flex-direction: column; gap: 0.4rem;
         }
-        .dash-main { padding: 2.5rem; }
-        .dash-metric {
-          display: flex; flex-direction: column; gap: 0.5rem; padding: 1.5rem;
-        }
+        .logout-btn:hover { color: var(--color-danger); background: var(--color-danger-bg); }
+        .dash-main { padding: 2.5rem; max-width: 1200px; width: 100%; }
+        .dash-metric { padding: 1.5rem; }
         .dash-metric-icon {
-          width: 40px; height: 40px; border-radius: var(--radius-md);
+          width: 42px; height: 42px; border-radius: var(--radius-md);
           display: flex; align-items: center; justify-content: center;
+          margin-bottom: 0.75rem;
         }
         .watchlist-row {
           padding: 0.5rem 0;
@@ -355,14 +547,18 @@ export default function UserDashboard({ currentUser, onLogout, setActivePage }) 
           background: none; border: none; cursor: pointer;
           color: var(--color-border); transition: var(--transition-fast);
         }
-        .star-btn.active { color: var(--color-gold); }
-        .star-btn:hover { color: var(--color-gold); transform: scale(1.2); }
+        .star-btn.active { color: #1a3edb; }
+        .star-btn:hover { color: #1a3edb; transform: scale(1.2); }
         .type-badge {
           font-size: 0.7rem; font-weight: 800; padding: 0.2rem 0.5rem;
           border-radius: var(--radius-sm); letter-spacing: 0.03em;
         }
         .badge-buy { background: var(--color-success-bg); color: var(--color-success); }
         .badge-sell { background: var(--color-danger-bg); color: var(--color-danger); }
+        @media (max-width: 992px) {
+          .grid-cols-4 { grid-template-columns: repeat(2, 1fr); }
+          .grid-cols-3 { grid-template-columns: 1fr; }
+        }
         @media (max-width: 768px) {
           .dash-layout { grid-template-columns: 1fr; }
           .dash-sidebar {

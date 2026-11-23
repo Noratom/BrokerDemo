@@ -34,6 +34,17 @@ let markets = [
 
 let trades = [];
 let contactMessages = [];
+let walletTransactions = [
+  {
+    id: 'DEP-INIT01',
+    userId: 'user_1',
+    type: 'DEPOSIT',
+    method: 'USDT (TRC20)',
+    amount: 15000,
+    status: 'COMPLETED',
+    timestamp: new Date().toISOString()
+  }
+];
 
 // Helper to simulate live market price ticking/drift
 const tickPrices = () => {
@@ -294,6 +305,120 @@ app.post('/api/contact', (req, res) => {
 
   contactMessages.push(newMessage);
   res.json({ status: 'success', message: 'Message logged. Support will contact you shortly.' });
+});
+
+// ==========================================
+// WALLET / FUNDING ROUTES (DEPOSIT & WITHDRAW)
+// ==========================================
+
+// Get user transactions
+app.get('/api/wallet/transactions/:userId', (req, res) => {
+  const list = walletTransactions.filter(t => t.userId === req.params.userId);
+  res.json({ status: 'success', data: list });
+});
+
+// Process Deposit
+app.post('/api/wallet/deposit', (req, res) => {
+  const { userId, amount, method, txHash } = req.body;
+  const numAmount = parseFloat(amount);
+
+  if (!numAmount || numAmount <= 0) {
+    return res.status(400).json({ status: 'error', message: 'Invalid deposit amount.' });
+  }
+
+  const user = users.find(u => u.id === userId);
+  if (!user && userId !== 'guest') {
+    return res.status(404).json({ status: 'error', message: 'User not found.' });
+  }
+
+  const newTx = {
+    id: `DEP-${Math.random().toString(36).substr(2, 8).toUpperCase()}`,
+    userId: userId || 'guest',
+    type: 'DEPOSIT',
+    method: method || 'USDT (TRC20)',
+    amount: numAmount,
+    txHash: txHash || `0x${Math.random().toString(16).substr(2, 24)}`,
+    status: 'COMPLETED',
+    timestamp: new Date().toISOString()
+  };
+
+  walletTransactions.unshift(newTx);
+
+  if (user) {
+    user.balance = Number((user.balance + numAmount).toFixed(2));
+  }
+
+  res.status(201).json({
+    status: 'success',
+    data: {
+      transaction: newTx,
+      newBalance: user ? user.balance : numAmount
+    }
+  });
+});
+
+// Process Withdrawal Request
+app.post('/api/wallet/withdraw', (req, res) => {
+  const { userId, amount, method, destination } = req.body;
+  const numAmount = parseFloat(amount);
+
+  if (!numAmount || numAmount <= 0) {
+    return res.status(400).json({ status: 'error', message: 'Invalid withdrawal amount.' });
+  }
+
+  const user = users.find(u => u.id === userId);
+  if (!user && userId !== 'guest') {
+    return res.status(404).json({ status: 'error', message: 'User not found.' });
+  }
+
+  if (user && user.balance < numAmount) {
+    return res.status(400).json({ status: 'error', message: 'Insufficient funds.' });
+  }
+
+  if (user) {
+    user.balance = Number((user.balance - numAmount).toFixed(2));
+  }
+
+  const newTx = {
+    id: `WTH-${Math.random().toString(36).substr(2, 8).toUpperCase()}`,
+    userId: userId || 'guest',
+    type: 'WITHDRAWAL',
+    method: method || 'USDT',
+    amount: numAmount,
+    destination: destination || 'Direct Transfer',
+    status: 'PENDING',
+    timestamp: new Date().toISOString()
+  };
+
+  walletTransactions.unshift(newTx);
+
+  res.status(201).json({
+    status: 'success',
+    data: {
+      transaction: newTx,
+      newBalance: user ? user.balance : 0
+    }
+  });
+});
+
+// Admin endpoint to view all transactions
+app.get('/api/admin/transactions', (req, res) => {
+  const populated = walletTransactions.map(tx => {
+    const user = users.find(u => u.id === tx.userId);
+    return { ...tx, userEmail: user ? user.email : 'Guest / External' };
+  });
+  res.json({ status: 'success', data: populated });
+});
+
+// Admin endpoint to update transaction status
+app.post('/api/admin/transactions/:id/status', (req, res) => {
+  const { status } = req.body;
+  const tx = walletTransactions.find(t => t.id === req.params.id);
+  if (!tx) {
+    return res.status(404).json({ status: 'error', message: 'Transaction not found.' });
+  }
+  tx.status = status;
+  res.json({ status: 'success', data: tx });
 });
 
 // ==========================================
