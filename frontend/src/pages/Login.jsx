@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Lock, Mail, TrendingUp, Shield, ArrowRight, Eye, EyeOff, CheckCircle } from 'lucide-react';
+import { Lock, Mail, TrendingUp, Shield, ArrowRight, Eye, EyeOff, CheckCircle, Zap, Cpu, KeyRound } from 'lucide-react';
 import { API_BASE_URL } from '../config';
 
 export default function Login({ onAuthSuccess, onSwitchToRegister }) {
@@ -24,7 +24,7 @@ export default function Login({ onAuthSuccess, onSwitchToRegister }) {
       if (response.ok) {
         onAuthSuccess(result.data);
       } else {
-        setError(result.message || 'Invalid credentials.');
+        setError(result.message || 'Invalid institutional credentials.');
       }
     } catch (err) {
       const norm = email.toLowerCase();
@@ -45,110 +45,203 @@ export default function Login({ onAuthSuccess, onSwitchToRegister }) {
           kycStatus: 'verified'
         });
       } else {
-        setError('Invalid credentials. Try client@continuum-trading.com / client123');
+        setError('Invalid credentials. Use 1-Click Access below or verify your login.');
       }
     } finally {
       setLoading(false);
     }
   };
 
+  const fillClient = () => {
+    setEmail('client@continuum-trading.com');
+    setPassword('client123');
+    setError(null);
+  };
+
+  const fillAdmin = () => {
+    setEmail('admin@continuum-trading.com');
+    setPassword('admin123');
+    setError(null);
+  };
+
   return (
-    <div className="auth-page page-enter">
-      <div className="auth-split">
-        {/* Left Branding Panel */}
-        <div className="auth-brand-panel">
-          <div className="auth-brand-content">
-            <div className="flex items-center gap-3" style={{ marginBottom: '2.5rem' }}>
-              <TrendingUp size={32} />
-              <span className="auth-logo-text">CONTINUUM<span className="gold-shimmer"> TRADING</span></span>
+    <div className="auth-page">
+      {/* Ambient Void Glow */}
+      <div className="auth-ambient-glow"></div>
+
+      <div className="auth-shell">
+        {/* Left Branding / Telemetry Desk */}
+        <div className="auth-brand-pane">
+          <div className="auth-brand-header">
+            <div className="auth-logo flex items-center gap-2">
+              <span className="continuum-dot"></span>
+              <span className="auth-brand-logo-text">CONTINUUM<span className="logo-dim"> TRADING</span></span>
             </div>
-            <h1 className="auth-brand-title">Welcome Back</h1>
-            <p className="auth-brand-desc">
-              Access your portfolio, manage open positions, and monitor live market feeds from your personalized dashboard.
+            <div className="auth-system-badge font-mono">
+              <span className="pulse-dot"></span>
+              <span>INSTITUTIONAL ACCESS // 256-BIT SSL</span>
+            </div>
+          </div>
+
+          <div className="auth-brand-body">
+            <h1 className="auth-brand-headline">
+              Direct Market Access.<br />
+              <span className="text-amber">Zero Latency Execution.</span>
+            </h1>
+            <p className="auth-brand-paragraph">
+              Enter your authorized credentials to manage institutional positions, monitor real-time order flow, and accrue automated cycle returns.
             </p>
-            <div className="auth-features-list">
-              {['Real-time market data', 'Instant order execution', 'Portfolio analytics', 'Secure SSL encryption'].map((f, i) => (
-                <div key={i} className="auth-feature-item">
-                  <CheckCircle size={16} />
-                  <span>{f}</span>
+
+            <div className="auth-security-perks">
+              {[
+                { title: 'LD4 Equinix Sub-Millisecond Cross-Connect', sub: 'Direct fiber matching engine in London & NY4' },
+                { title: 'Tier-1 Segregated Liquidity Custody', sub: 'All client funds held under statutory trust escrow' },
+                { title: 'Automated Yield Accrual Engine', sub: 'Smart contract verified 24h, 48h, and 72h cycles' },
+                { title: 'Hardware-Grade 256-Bit AES Encryption', sub: 'End-to-end cryptographic execution safeguarding' },
+              ].map((item, i) => (
+                <div key={i} className="auth-perk-item">
+                  <div className="auth-perk-icon">
+                    <CheckCircle size={15} />
+                  </div>
+                  <div className="auth-perk-text">
+                    <div className="auth-perk-title">{item.title}</div>
+                    <div className="auth-perk-sub font-mono">{item.sub}</div>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
-          <div className="auth-brand-footer">
-            <Shield size={14} />
-            <span>Protected by 256-bit SSL encryption</span>
+
+          <div className="auth-brand-footer font-mono">
+            <div className="auth-footer-telemetry">
+              <span className="telemetry-live-dot"></span>
+              <span>LD4 LONDON DESK: <strong>1.4ms</strong></span>
+              <span className="footer-sep">|</span>
+              <span>FIX 4.4 STREAM: <strong>ACTIVE</strong></span>
+            </div>
           </div>
         </div>
 
-        {/* Right Form Panel */}
-        <div className="auth-form-panel">
-          <div className="auth-form-container">
-            <h2 className="auth-form-title">Sign In</h2>
-            <p className="text-muted text-sm" style={{ marginBottom: '2rem' }}>Enter your credentials to access the trading platform.</p>
+        {/* Right Form Desk */}
+        <div className="auth-form-pane">
+          <div className="auth-form-box">
+            <div className="auth-form-header">
+              <span className="auth-card-tag font-mono">TERMINAL SIGN IN</span>
+              <h2 className="auth-form-title">Member Access</h2>
+              <p className="auth-form-subtitle">Enter your registered email and credentials below.</p>
+            </div>
+
+            {/* Quick 1-Click Access for Instant Testing */}
+            <div className="auth-quick-creds">
+              <div className="quick-creds-label font-mono">
+                <KeyRound size={12} className="text-amber" />
+                <span>1-CLICK DEMO CREDENTIALS:</span>
+              </div>
+              <div className="quick-creds-buttons">
+                <button
+                  type="button"
+                  className="quick-btn font-mono"
+                  onClick={fillClient}
+                  title="Load Alexander Wright (Live Client)"
+                >
+                  <span>Client (Alexander W.)</span>
+                </button>
+                <button
+                  type="button"
+                  className="quick-btn font-mono"
+                  onClick={fillAdmin}
+                  title="Load Chief Compliance Officer (Admin)"
+                >
+                  <span>Admin (Compliance Officer)</span>
+                </button>
+              </div>
+            </div>
 
             {error && (
-              <div className="auth-error">{error}</div>
+              <div className="auth-error-alert font-mono">
+                <span>{error}</span>
+              </div>
             )}
 
-            <form onSubmit={handleSubmit}>
-              <div className="form-group">
-                <label className="form-label">Email Address</label>
-                <div className="input-wrapper">
-                  <Mail size={18} className="input-icon" />
+            <form onSubmit={handleSubmit} className="auth-form">
+              <div className="form-group-field">
+                <label className="form-field-label font-mono">
+                  <span>[ USER EMAIL ]</span>
+                </label>
+                <div className="input-field-wrap">
+                  <Mail size={16} className="field-icon" />
                   <input
                     type="email"
                     required
-                    className="form-input form-input-icon"
-                    placeholder="you@example.com"
+                    className="auth-input font-mono"
+                    placeholder="client@continuum-trading.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                   />
                 </div>
               </div>
 
-              <div className="form-group">
-                <label className="form-label flex justify-between">
-                  <span>Password</span>
-                  <button type="button" className="forgot-link">Forgot password?</button>
-                </label>
-                <div className="input-wrapper">
-                  <Lock size={18} className="input-icon" />
+              <div className="form-group-field">
+                <div className="flex justify-between items-center">
+                  <label className="form-field-label font-mono">
+                    <span>[ PASSKEY ]</span>
+                  </label>
+                  <span className="field-hint font-mono">ENCRYPTED</span>
+                </div>
+                <div className="input-field-wrap">
+                  <Lock size={16} className="field-icon" />
                   <input
                     type={showPassword ? 'text' : 'password'}
                     required
-                    className="form-input form-input-icon"
+                    className="auth-input font-mono"
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />
                   <button
                     type="button"
-                    className="password-toggle"
+                    className="field-toggle-btn"
                     onClick={() => setShowPassword(!showPassword)}
+                    tabIndex="-1"
                   >
-                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
                 </div>
               </div>
 
-              <button type="submit" className="btn btn-primary btn-lg w-full" disabled={loading}>
-                {loading ? 'Authenticating...' : 'Sign In'}
-                {!loading && <ArrowRight size={18} />}
+              <button
+                type="submit"
+                className="btn btn-gold btn-lg w-full auth-submit-btn font-mono"
+                disabled={loading}
+              >
+                {loading ? (
+                  <span>AUTHENTICATING DESK...</span>
+                ) : (
+                  <>
+                    <span>ACCESS TERMINAL</span>
+                    <ArrowRight size={16} />
+                  </>
+                )}
               </button>
             </form>
 
-            <div className="auth-switch">
-              <span className="text-muted text-sm">Don't have an account?</span>
-              <button onClick={onSwitchToRegister} className="auth-switch-btn">
-                Open an official account
+            <div className="auth-switcher">
+              <span className="text-muted text-xs">Do not have an institutional account?</span>
+              <button
+                type="button"
+                onClick={onSwitchToRegister}
+                className="auth-switcher-link font-mono"
+              >
+                OPEN OFFICIAL ACCOUNT
               </button>
             </div>
 
-            <div className="auth-portal-hint">
-              <p className="text-xs text-muted">Portal Credentials:</p>
-              <code className="text-xs">client@continuum-trading.com / client123</code>
-              <code className="text-xs">admin@continuum-trading.com / admin123</code>
+            <div className="auth-trust-strip font-mono">
+              <span>EQUINIX LD4</span>
+              <span className="sep">•</span>
+              <span>TIER-1 SEGREGATED</span>
+              <span className="sep">•</span>
+              <span>256-BIT SSL</span>
             </div>
           </div>
         </div>
@@ -156,184 +249,379 @@ export default function Login({ onAuthSuccess, onSwitchToRegister }) {
 
       <style>{`
         .auth-page {
-          min-height: 100vh;
-          background-color: var(--color-bg);
-        }
-        .auth-split {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          min-height: 100vh;
-        }
-        .auth-brand-panel {
-          background: linear-gradient(135deg, var(--color-blue-deep) 0%, var(--color-blue-dark) 50%, #0d2b6b 100%);
-          color: var(--color-white);
-          display: flex;
-          flex-direction: column;
-          justify-content: space-between;
-          padding: 3rem;
-          position: relative;
-          overflow: hidden;
-        }
-        .auth-brand-panel::before {
-          content: '';
-          position: absolute;
-          top: -50%;
-          right: -30%;
-          width: 500px;
-          height: 500px;
-          background: radial-gradient(circle, rgba(201,152,26,0.12) 0%, transparent 70%);
-          border-radius: 50%;
-        }
-        .auth-brand-panel::after {
-          content: '';
-          position: absolute;
-          bottom: -30%;
-          left: -20%;
-          width: 400px;
-          height: 400px;
-          background: radial-gradient(circle, rgba(37,99,235,0.15) 0%, transparent 70%);
-          border-radius: 50%;
-        }
-        .auth-brand-content {
-          position: relative;
-          z-index: 1;
-          margin-top: 2rem;
-        }
-        .auth-logo-text {
-          font-family: var(--font-heading);
-          font-weight: 800;
-          font-size: 1.8rem;
-          letter-spacing: 0.04em;
-        }
-        .auth-brand-title {
-          color: var(--color-white);
-          font-size: 2.8rem;
-          margin-bottom: 1rem;
-        }
-        .auth-brand-desc {
-          color: rgba(255,255,255,0.7);
-          font-size: 1.05rem;
-          line-height: 1.6;
-          max-width: 400px;
-        }
-        .auth-features-list {
-          display: flex;
-          flex-direction: column;
-          gap: 0.75rem;
-          margin-top: 2.5rem;
-        }
-        .auth-feature-item {
-          display: flex;
-          align-items: center;
-          gap: 0.6rem;
-          font-size: 0.9rem;
-          color: rgba(255,255,255,0.85);
-        }
-        .auth-feature-item svg {
-          color: var(--color-gold-bright);
-          flex-shrink: 0;
-        }
-        .auth-brand-footer {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          font-size: 0.75rem;
-          color: rgba(255,255,255,0.4);
-          position: relative;
-          z-index: 1;
-        }
-        .auth-form-panel {
+          min-height: calc(100vh - 70px);
+          background-color: #090a0f;
           display: flex;
           align-items: center;
           justify-content: center;
-          padding: 3rem;
-          background-color: var(--color-white);
+          padding: 2.5rem 1.5rem;
+          position: relative;
+          overflow: hidden;
         }
-        .auth-form-container {
+        .auth-ambient-glow {
+          position: absolute;
+          width: 700px;
+          height: 700px;
+          border-radius: 50%;
+          background: radial-gradient(circle, rgba(245, 166, 35, 0.08) 0%, rgba(9, 10, 15, 0) 70%);
+          top: 10%;
+          left: 50%;
+          transform: translateX(-50%);
+          pointer-events: none;
+          z-index: 0;
+          filter: blur(40px);
+        }
+        .auth-shell {
+          position: relative;
+          z-index: 1;
+          display: grid;
+          grid-template-columns: 1.15fr 1fr;
+          max-width: 1080px;
           width: 100%;
-          max-width: 420px;
+          background: #0e1017;
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          border-radius: 20px;
+          overflow: hidden;
+          box-shadow: 0 30px 80px rgba(0, 0, 0, 0.65);
+        }
+
+        /* Left Brand Pane */
+        .auth-brand-pane {
+          background: #11141e;
+          border-right: 1px solid rgba(255, 255, 255, 0.06);
+          padding: 3rem 2.5rem;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          position: relative;
+        }
+        .auth-brand-pane::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 2px;
+          background: linear-gradient(90deg, transparent, var(--color-amber), transparent);
+        }
+        .auth-brand-header {
+          display: flex;
+          flex-direction: column;
+          gap: 0.75rem;
+        }
+        .auth-brand-logo-text {
+          font-family: var(--font-heading);
+          font-weight: 800;
+          font-size: 1.25rem;
+          letter-spacing: 0.06em;
+          color: #ffffff;
+        }
+        .logo-dim {
+          color: #64748b;
+        }
+        .continuum-dot {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background: var(--color-amber);
+          box-shadow: 0 0 10px var(--color-amber);
+          display: inline-block;
+        }
+        .auth-system-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.45rem;
+          font-size: 0.65rem;
+          color: #94a3b8;
+          letter-spacing: 0.08em;
+          background: rgba(255, 255, 255, 0.03);
+          border: 1px solid rgba(255, 255, 255, 0.06);
+          padding: 0.25rem 0.6rem;
+          border-radius: 9999px;
+          width: fit-content;
+        }
+        .pulse-dot {
+          width: 5px;
+          height: 5px;
+          border-radius: 50%;
+          background: #10b981;
+          box-shadow: 0 0 6px #10b981;
+        }
+        .auth-brand-body {
+          margin: 2rem 0;
+        }
+        .auth-brand-headline {
+          font-size: 2rem;
+          font-weight: 800;
+          color: #ffffff;
+          line-height: 1.2;
+          letter-spacing: -0.02em;
+          margin-bottom: 0.85rem;
+        }
+        .text-amber {
+          color: var(--color-amber);
+        }
+        .auth-brand-paragraph {
+          font-size: 0.88rem;
+          color: #94a3b8;
+          line-height: 1.6;
+          margin-bottom: 2rem;
+        }
+        .auth-security-perks {
+          display: flex;
+          flex-direction: column;
+          gap: 1rem;
+        }
+        .auth-perk-item {
+          display: flex;
+          align-items: flex-start;
+          gap: 0.75rem;
+        }
+        .auth-perk-icon {
+          color: var(--color-amber);
+          margin-top: 2px;
+          flex-shrink: 0;
+        }
+        .auth-perk-title {
+          font-size: 0.82rem;
+          font-weight: 600;
+          color: #ffffff;
+          line-height: 1.3;
+        }
+        .auth-perk-sub {
+          font-size: 0.7rem;
+          color: #64748b;
+          margin-top: 0.15rem;
+        }
+        .auth-brand-footer {
+          padding-top: 1.5rem;
+          border-top: 1px solid rgba(255, 255, 255, 0.06);
+          font-size: 0.7rem;
+          color: #64748b;
+        }
+        .auth-footer-telemetry {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          letter-spacing: 0.05em;
+        }
+        .telemetry-live-dot {
+          width: 5px;
+          height: 5px;
+          border-radius: 50%;
+          background: #10b981;
+        }
+        .footer-sep {
+          color: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Right Form Pane */
+        .auth-form-pane {
+          background: #090a0f;
+          padding: 3rem 2.5rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .auth-form-box {
+          width: 100%;
+          max-width: 400px;
+        }
+        .auth-card-tag {
+          font-size: 0.65rem;
+          color: var(--color-amber);
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          font-weight: 700;
         }
         .auth-form-title {
-          font-size: 1.8rem;
-          margin-bottom: 0.25rem;
+          font-size: 1.75rem;
+          font-weight: 800;
+          color: #ffffff;
+          margin-top: 0.25rem;
+          letter-spacing: -0.01em;
         }
-        .input-wrapper {
+        .auth-form-subtitle {
+          font-size: 0.82rem;
+          color: #64748b;
+          margin-top: 0.35rem;
+          margin-bottom: 1.5rem;
+        }
+
+        /* Quick Credentials Buttons */
+        .auth-quick-creds {
+          background: rgba(245, 166, 35, 0.05);
+          border: 1px dashed rgba(245, 166, 35, 0.25);
+          border-radius: 8px;
+          padding: 0.75rem;
+          margin-bottom: 1.5rem;
+        }
+        .quick-creds-label {
+          font-size: 0.65rem;
+          color: #94a3b8;
+          display: flex;
+          align-items: center;
+          gap: 0.35rem;
+          letter-spacing: 0.06em;
+          margin-bottom: 0.45rem;
+        }
+        .quick-creds-buttons {
+          display: flex;
+          gap: 0.5rem;
+        }
+        .quick-btn {
+          flex: 1;
+          background: #12151f;
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          color: #cbd5e1;
+          font-size: 0.68rem;
+          padding: 0.4rem 0.5rem;
+          border-radius: 6px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          text-align: center;
+        }
+        .quick-btn:hover {
+          background: rgba(245, 166, 35, 0.15);
+          border-color: var(--color-amber);
+          color: #ffffff;
+        }
+
+        .auth-error-alert {
+          background: rgba(244, 63, 94, 0.12);
+          border: 1px solid rgba(244, 63, 94, 0.3);
+          color: #f87171;
+          padding: 0.65rem 0.85rem;
+          border-radius: 8px;
+          font-size: 0.75rem;
+          margin-bottom: 1.25rem;
+        }
+
+        .auth-form {
+          display: flex;
+          flex-direction: column;
+          gap: 1.15rem;
+        }
+        .form-group-field {
+          display: flex;
+          flex-direction: column;
+          gap: 0.4rem;
+        }
+        .form-field-label {
+          font-size: 0.68rem;
+          color: #94a3b8;
+          letter-spacing: 0.08em;
+          font-weight: 600;
+        }
+        .field-hint {
+          font-size: 0.62rem;
+          color: #64748b;
+          letter-spacing: 0.08em;
+        }
+        .input-field-wrap {
           position: relative;
           display: flex;
           align-items: center;
         }
-        .input-icon {
+        .field-icon {
           position: absolute;
           left: 14px;
-          color: var(--color-text-muted);
+          color: #64748b;
           pointer-events: none;
         }
-        .form-input-icon {
-          padding-left: 2.75rem;
+        .auth-input {
           width: 100%;
+          background: #131724;
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          border-radius: 9999px;
+          padding: 0.8rem 1rem 0.8rem 2.6rem;
+          color: #ffffff;
+          font-size: 0.85rem;
+          outline: none;
+          transition: all 0.2s ease;
         }
-        .password-toggle {
+        .auth-input:focus {
+          border-color: var(--color-amber);
+          box-shadow: 0 0 15px rgba(245, 166, 35, 0.2);
+          background: #161b2a;
+        }
+        .auth-input::placeholder {
+          color: #475569;
+        }
+        .field-toggle-btn {
           position: absolute;
           right: 14px;
           background: none;
           border: none;
+          color: #64748b;
           cursor: pointer;
-          color: var(--color-text-muted);
-          transition: var(--transition-fast);
+          display: flex;
+          align-items: center;
+          padding: 0;
+          transition: color 0.2s ease;
         }
-        .password-toggle:hover { color: var(--color-blue-primary); }
-        .forgot-link {
-          background: none;
-          border: none;
-          font-size: 0.8rem;
-          color: var(--color-blue-primary);
-          cursor: pointer;
-          font-weight: 500;
+        .field-toggle-btn:hover {
+          color: #ffffff;
         }
-        .forgot-link:hover { text-decoration: underline; }
-        .auth-error {
-          background-color: var(--color-danger-bg);
-          color: var(--color-danger);
-          padding: 0.75rem 1rem;
-          border-radius: var(--radius-sm);
-          border-left: 4px solid var(--color-danger);
-          font-size: 0.85rem;
-          margin-bottom: 1.5rem;
-        }
-        .auth-switch {
+        .auth-submit-btn {
+          margin-top: 0.75rem;
           display: flex;
           align-items: center;
           justify-content: center;
           gap: 0.5rem;
-          margin-top: 2rem;
-          padding-top: 1.5rem;
-          border-top: 1px solid var(--color-border-light);
+          letter-spacing: 0.06em;
+          font-weight: 800;
+          padding: 0.85rem 1.5rem;
         }
-        .auth-switch-btn {
-          background: none;
-          border: none;
-          font-weight: 700;
-          color: var(--color-blue-primary);
-          cursor: pointer;
-          font-size: 0.9rem;
-        }
-        .auth-switch-btn:hover { text-decoration: underline; }
-        .auth-portal-hint {
+
+        .auth-switcher {
           margin-top: 1.5rem;
-          padding: 0.75rem;
-          background-color: var(--color-blue-mist);
-          border-radius: var(--radius-sm);
+          text-align: center;
           display: flex;
           flex-direction: column;
-          gap: 0.25rem;
+          gap: 0.35rem;
+          padding-top: 1.25rem;
+          border-top: 1px solid rgba(255, 255, 255, 0.06);
         }
-        .auth-portal-hint code {
-          font-family: monospace;
-          color: var(--color-blue-royal);
+        .auth-switcher-link {
+          background: none;
+          border: none;
+          color: var(--color-amber);
+          font-size: 0.75rem;
+          font-weight: 700;
+          letter-spacing: 0.08em;
+          cursor: pointer;
+          transition: color 0.2s ease;
         }
-        @media (max-width: 768px) {
-          .auth-split { grid-template-columns: 1fr; }
-          .auth-brand-panel { display: none; }
+        .auth-switcher-link:hover {
+          color: #ffb800;
+          text-decoration: underline;
+        }
+
+        .auth-trust-strip {
+          margin-top: 1.5rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.5rem;
+          font-size: 0.62rem;
+          color: #475569;
+          letter-spacing: 0.08em;
+        }
+        .auth-trust-strip .sep {
+          color: rgba(255, 255, 255, 0.1);
+        }
+
+        @media (max-width: 860px) {
+          .auth-shell {
+            grid-template-columns: 1fr;
+          }
+          .auth-brand-pane {
+            display: none;
+          }
+          .auth-form-pane {
+            padding: 2rem 1.5rem;
+          }
         }
       `}</style>
     </div>

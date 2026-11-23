@@ -220,16 +220,19 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
           left: 0;
           width: 100vw;
           height: 100vh;
-          background-color: rgba(10, 25, 47, 0.65);
-          backdrop-filter: blur(4px);
+          background-color: rgba(9, 10, 15, 0.85);
+          backdrop-filter: blur(8px);
           z-index: 2000;
         }
         .auth-modal {
-          width: 420px;
+          width: 440px;
           max-width: 90%;
-          padding: 2rem;
-          box-shadow: var(--shadow-premium);
-          border-top: 4px solid var(--color-blue-royal);
+          padding: 2.25rem;
+          background: #0e1017;
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          border-top: 3px solid var(--color-amber);
+          border-radius: 18px;
+          box-shadow: 0 25px 60px rgba(0, 0, 0, 0.75);
           animation: scaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
         @keyframes scaleUp {
@@ -240,16 +243,16 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
           background: none;
           border: none;
           cursor: pointer;
-          color: var(--color-text-muted);
+          color: #64748b;
           transition: var(--transition-fast);
         }
         .auth-close:hover {
-          color: var(--color-danger);
+          color: #ffffff;
         }
         .auth-title {
           font-size: 1.25rem;
           font-weight: 700;
-          color: var(--color-blue-deep);
+          color: #ffffff;
         }
         .input-icon-wrapper {
           position: relative;

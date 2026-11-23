@@ -116,13 +116,25 @@ export default function Navbar({ activePage, setActivePage, currentUser, onLogou
               </button>
             </div>
           ) : (
-            <button
-              className="btn btn-secondary btn-sm nav-cta-pill flex items-center gap-2"
-              onClick={onOpenAuth}
-            >
-              <span className="continuum-dot"></span>
-              <span>VIEW PLANS</span>
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                className="nav-member-access font-mono"
+                onClick={onOpenAuth}
+              >
+                MEMBER ACCESS
+              </button>
+              <button
+                className="btn btn-secondary btn-sm nav-cta-pill flex items-center gap-2"
+                onClick={() => {
+                  const el = document.getElementById('account-tiers') || document.getElementById('investment');
+                  if (el) el.scrollIntoView({ behavior: 'smooth' });
+                  else onOpenAuth();
+                }}
+              >
+                <span className="continuum-dot"></span>
+                <span className="font-mono">VIEW PLANS</span>
+              </button>
+            </div>
           )}
         </div>
 
@@ -297,6 +309,19 @@ export default function Navbar({ activePage, setActivePage, currentUser, onLogou
         }
         .admin-nav-btn {
           color: var(--color-amber) !important;
+        }
+        .nav-member-access {
+          background: transparent;
+          border: none;
+          color: #94a3b8;
+          font-size: 0.75rem;
+          letter-spacing: 0.08em;
+          padding: 0.4rem 0.6rem;
+          cursor: pointer;
+          transition: color 0.2s ease;
+        }
+        .nav-member-access:hover {
+          color: #ffffff;
         }
         .nav-cta-pill {
           font-family: var(--font-mono);

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Shield, Award, Zap, ChevronRight, Check, Sparkles,
   Lock, BarChart2, TrendingUp, Globe, CheckSquare, Phone,
@@ -9,6 +9,8 @@ import TradingSimulator from '../components/TradingSimulator';
 import CompareCalculator from '../components/CompareCalculator';
 
 export default function Home({ selectedAsset, setSelectedAsset, currentUser, onOpenAuth, onOpenFunding, onOpenPlanModal }) {
+  const [activeRadarSeries, setActiveRadarSeries] = useState('mental-edge');
+
   // Intersection Observer for scroll animations
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -28,55 +30,90 @@ export default function Home({ selectedAsset, setSelectedAsset, currentUser, onO
     return () => observer.disconnect();
   }, []);
 
+  // Radar Series metadata matching Continuum Trading architecture
+  const radarSeriesData = {
+    foundation: {
+      tag: 'FOUNDATION - SERIES 1',
+      desc: 'Core market mechanics, auction theory, order book dynamics and risk foundations.',
+      node: { cx: 140, cy: 130 },
+    },
+    advanced: {
+      tag: 'ADVANCED - SERIES 2',
+      desc: 'Order flow, volume profile imbalances, institutional footprint and liquidity sweeps.',
+      node: { cx: 250, cy: 110 },
+    },
+    'mental-edge': {
+      tag: 'MENTAL EDGE - SERIES 3',
+      desc: 'Identity, behaviour and emotional regulation, with exercises and frameworks. Four modules and nearly thirty lessons.',
+      node: { cx: 295, cy: 100 },
+    },
+    community: {
+      tag: 'COMMUNITY - LIVE DESK',
+      desc: 'Live daily execution debriefs, London/NY desk voice channels, and proprietary trade feeds.',
+      node: { cx: 270, cy: 65 },
+    },
+  };
+
   // Investment / pricing tiers (Bronze / Silver / Premium)
   const pricingTiers = [
     {
       name: 'Bronze',
+      categoryTag: 'FOUNDATION',
       subtitle: 'Investment Service',
       roi: '20%',
+      targetCycle: 'TARGET RETURN / 24 HOURS',
       duration: '24 hours',
       min: '$500.00',
       minRaw: '500',
       max: '$10,000.00',
+      ctaLabel: '+ Get Started ($500)',
       features: [
-        'Duration 24 hours',
-        'Minimum $500.00',
-        'Maximum $10,000.00',
-        'Asset Protection',
-        'Live Support',
+        'Duration: 24 Hours Cycle',
+        'Minimum Deposit: $500',
+        'Maximum Deposit: $10,000',
+        'Automated Risk Guard',
+        '24/7 Member Desk Support',
       ],
     },
     {
       name: 'Silver',
+      categoryTag: 'ADVANCED EDGE',
       subtitle: 'Investment Service',
       roi: '40%',
+      targetCycle: 'TARGET RETURN / 48 HOURS',
       duration: '48 hours',
       min: '$10,000.00',
       minRaw: '10000',
       max: '$50,000.00',
       popular: true,
+      ctaLabel: '+ Get Started ($10,000)',
       features: [
-        'Duration 48 hours',
-        'Minimum $10,000.00',
-        'Maximum $50,000.00',
-        'Asset Protection',
-        'Live Support',
+        'Duration: 48 Hours Cycle',
+        'Minimum Deposit: $10,000',
+        'Maximum Deposit: $50,000',
+        'Priority Liquidity Routing',
+        'Dedicated Execution Manager',
+        'Daily Market Briefings',
       ],
     },
     {
       name: 'Premium',
+      categoryTag: 'MENTAL EDGE / VIP',
       subtitle: 'Investment Service',
       roi: '60%',
+      targetCycle: 'TARGET RETURN / 72 HOURS',
       duration: '72 hours',
       min: '$50,000.00',
       minRaw: '50000',
       max: 'UNLIMITED',
+      ctaLabel: '+ Get Started ($50,000)',
       features: [
-        'Duration 72 hours',
-        'Minimum $50,000.00',
-        'Maximum UNLIMITED',
-        'Asset Protection',
-        'Live Support',
+        'Duration: 72 Hours Cycle',
+        'Minimum Deposit: $50,000',
+        'Maximum Deposit: Unlimited',
+        'Raw Institutional Liquidity',
+        'Direct Desk Mentorship',
+        'Priority Blockchain Withdrawals',
       ],
     },
   ];
@@ -197,27 +234,47 @@ export default function Home({ selectedAsset, setSelectedAsset, currentUser, onO
 
           {/* Right Continuum Radar Graphic */}
           <div className="hero-radar-wrapper flex items-center justify-center animate-slide-right visible">
+            {/* Ambient Void Glow */}
+            <div className="hero-radar-glow-ambient"></div>
+
             <div className="continuum-radar-box">
               <svg viewBox="0 0 380 380" className="radar-svg">
                 <defs>
                   <radialGradient id="radarGlow" cx="50%" cy="50%" r="50%">
-                    <stop offset="0%" stopColor="rgba(245, 166, 35, 0.15)" />
-                    <stop offset="60%" stopColor="rgba(245, 166, 35, 0.03)" />
+                    <stop offset="0%" stopColor="rgba(245, 166, 35, 0.16)" />
+                    <stop offset="65%" stopColor="rgba(245, 166, 35, 0.03)" />
                     <stop offset="100%" stopColor="transparent" />
                   </radialGradient>
+                  <linearGradient id="sweepConeGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="rgba(245, 166, 35, 0)" />
+                    <stop offset="50%" stopColor="rgba(245, 166, 35, 0.08)" />
+                    <stop offset="100%" stopColor="rgba(245, 166, 35, 0.35)" />
+                  </linearGradient>
                 </defs>
 
                 {/* Concentric rings */}
-                <circle cx="190" cy="190" r="160" fill="url(#radarGlow)" stroke="rgba(255,255,255,0.06)" strokeWidth="1" />
+                <circle cx="190" cy="190" r="160" fill="url(#radarGlow)" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
                 <circle cx="190" cy="190" r="120" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="1" strokeDasharray="3 3" />
                 <circle cx="190" cy="190" r="80" fill="none" stroke="rgba(255,255,255,0.12)" strokeWidth="1" />
                 <circle cx="190" cy="190" r="40" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="1" />
 
-                {/* Crosshairs */}
-                <line x1="190" y1="20" x2="190" y2="360" stroke="rgba(255,255,255,0.05)" strokeWidth="1" />
-                <line x1="20" y1="190" x2="360" y2="190" stroke="rgba(255,255,255,0.05)" strokeWidth="1" />
+                {/* Crosshairs & Compass Ticks */}
+                <line x1="190" y1="20" x2="190" y2="360" stroke="rgba(255,255,255,0.06)" strokeWidth="1" strokeDasharray="2 4" />
+                <line x1="20" y1="190" x2="360" y2="190" stroke="rgba(255,255,255,0.06)" strokeWidth="1" strokeDasharray="2 4" />
 
-                {/* Radar nodes */}
+                {/* Ring Labels */}
+                <text x="190" y="44" fill="#64748b" fontSize="7.5" fontFamily="monospace" letterSpacing="0.1em" textAnchor="middle">COMMUNITY • LIVE</text>
+                <text x="190" y="82" fill="#475569" fontSize="7" fontFamily="monospace" letterSpacing="0.08em" textAnchor="middle">MENTAL EDGE</text>
+                <text x="190" y="122" fill="#475569" fontSize="6.5" fontFamily="monospace" letterSpacing="0.08em" textAnchor="middle">ADVANCED</text>
+                <text x="190" y="160" fill="#475569" fontSize="6.5" fontFamily="monospace" letterSpacing="0.08em" textAnchor="middle">FOUNDATION</text>
+
+                {/* Rotating Sweeping Radar Beam */}
+                <g className="radar-sweep-arm">
+                  <line x1="190" y1="190" x2="350" y2="190" stroke="#f5a623" strokeWidth="1.5" strokeOpacity="0.85" />
+                  <path d="M 190 190 L 350 190 A 160 160 0 0 0 328 85 Z" fill="url(#sweepConeGrad)" />
+                </g>
+
+                {/* Background Radar Nodes */}
                 <circle cx="190" cy="190" r="4" fill="#ffffff" />
                 <circle cx="140" cy="130" r="3" fill="#94a3b8" />
                 <circle cx="250" cy="110" r="3" fill="#94a3b8" />
@@ -227,18 +284,65 @@ export default function Home({ selectedAsset, setSelectedAsset, currentUser, onO
                 <circle cx="85" cy="170" r="2.5" fill="#64748b" />
                 <circle cx="310" cy="180" r="2.5" fill="#f43f5e" />
 
-                {/* Active Continuum Glowing Amber Node */}
-                <circle cx="295" cy="100" r="6" fill="#f5a623" className="radar-pulse-node" />
-                <circle cx="295" cy="100" r="12" fill="none" stroke="#f5a623" strokeWidth="1" opacity="0.6" />
+                {/* Active Glowing Continuum Amber Node */}
+                <circle
+                  cx={radarSeriesData[activeRadarSeries]?.node.cx || 295}
+                  cy={radarSeriesData[activeRadarSeries]?.node.cy || 100}
+                  r="6.5"
+                  fill="#f5a623"
+                  className="radar-pulse-node"
+                />
+                <circle
+                  cx={radarSeriesData[activeRadarSeries]?.node.cx || 295}
+                  cy={radarSeriesData[activeRadarSeries]?.node.cy || 100}
+                  r="13"
+                  fill="none"
+                  stroke="#f5a623"
+                  strokeWidth="1.2"
+                  opacity="0.6"
+                  className="radar-halo-node"
+                />
               </svg>
 
-              <div className="radar-tag-pill font-mono">
-                <span className="tech-dot"></span>
-                <span>MENTAL EDGE - SERIES 3</span>
+              {/* Series Switcher Buttons matching Continuum reference */}
+              <div className="radar-series-nav">
+                {[
+                  { id: 'foundation', label: 'FOUNDATION' },
+                  { id: 'advanced', label: 'ADVANCED' },
+                  { id: 'mental-edge', label: 'MENTAL EDGE' },
+                  { id: 'community', label: 'COMMUNITY' }
+                ].map((s) => (
+                  <button
+                    key={s.id}
+                    type="button"
+                    className={`radar-nav-pill font-mono ${activeRadarSeries === s.id ? 'active' : ''}`}
+                    onClick={() => setActiveRadarSeries(s.id)}
+                  >
+                    <span className="pill-dot"></span>
+                    <span>{s.label}</span>
+                  </button>
+                ))}
               </div>
-              <p className="radar-subtext">
-                Identity, execution and emotional regulation with live risk telemetry.
-              </p>
+
+              {/* Dynamic Series Descriptor matching Continuum reference */}
+              <div className="radar-detail-block">
+                <div className="radar-detail-header font-mono">
+                  {radarSeriesData[activeRadarSeries]?.tag}
+                </div>
+                <p className="radar-detail-text">
+                  {radarSeriesData[activeRadarSeries]?.desc}
+                </p>
+                <button
+                  type="button"
+                  className="radar-detail-link font-mono flex items-center justify-center gap-1"
+                  onClick={() => {
+                    document.getElementById('investment')?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                >
+                  <span>SEE THE MODULES</span>
+                  <ChevronRight size={13} />
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -437,21 +541,26 @@ export default function Home({ selectedAsset, setSelectedAsset, currentUser, onO
 
           <div className="pricing-grid">
             {pricingTiers.map((tier, index) => (
-              <div key={index} className={`pricing-card ${tier.popular ? 'pricing-card-popular' : ''}`}>
+              <div
+                key={index}
+                className={`pricing-card ${tier.popular ? 'pricing-card-popular' : ''} pricing-card-${tier.name.toLowerCase()}`}
+              >
                 {/* Header */}
                 <div className="pricing-card-header">
-                  {tier.popular && (
-                    <div className="popular-badge-wrap">
+                  <div className="pricing-card-meta-row">
+                    <span className="pricing-category-tag font-mono">{tier.categoryTag}</span>
+                    {tier.popular && (
                       <span className="popular-badge font-mono">MOST POPULAR</span>
-                    </div>
-                  )}
-                  <h3 className="pricing-card-name">{tier.name}</h3>
-                  <span className="pricing-card-service">{tier.subtitle}</span>
+                    )}
+                  </div>
+                  <h3 className="pricing-card-name">{tier.name} Series</h3>
+                  <span className="pricing-card-service font-mono">{tier.subtitle}</span>
                 </div>
 
                 {/* ROI Number */}
                 <div className="pricing-roi-block">
                   <div className="pricing-roi font-mono">{tier.roi}</div>
+                  <div className="pricing-cycle-tag font-mono">{tier.targetCycle}</div>
                 </div>
 
                 {/* Divider */}
@@ -472,12 +581,12 @@ export default function Home({ selectedAsset, setSelectedAsset, currentUser, onO
                 {/* Bottom CTA */}
                 <div className="pricing-bottom">
                   <button
-                    className={`btn w-full pricing-cta ${tier.popular ? 'btn-gold' : 'btn-primary'}`}
+                    className={`btn w-full pricing-cta ${tier.popular ? 'btn-gold' : 'btn-white-pill'}`}
                     onClick={() => handlePlanClick(tier)}
                   >
-                    <span>Get Started</span>
+                    <span>{tier.ctaLabel || `+ Get Started (${tier.min})`}</span>
                   </button>
-                  <p className="pricing-note font-mono">*Contact Us for Consultations.</p>
+                  <p className="pricing-note font-mono">*Consultation & Risk Guidance Included</p>
                 </div>
               </div>
             ))}
@@ -774,52 +883,138 @@ export default function Home({ selectedAsset, setSelectedAsset, currentUser, onO
         /* Continuum Radar Visual */
         .hero-radar-wrapper {
           position: relative;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .hero-radar-glow-ambient {
+          position: absolute;
+          width: 480px;
+          height: 480px;
+          border-radius: 50%;
+          background: radial-gradient(circle, rgba(245, 166, 35, 0.1) 0%, rgba(245, 166, 35, 0.02) 45%, transparent 70%);
+          pointer-events: none;
+          z-index: 0;
+          filter: blur(20px);
         }
         .continuum-radar-box {
           position: relative;
           width: 380px;
-          height: 380px;
-          border-radius: 50%;
+          height: 450px;
           display: flex;
           align-items: center;
-          justify-content: center;
+          justify-content: flex-start;
           flex-direction: column;
           text-align: center;
+          z-index: 1;
         }
         .radar-svg {
-          position: absolute;
-          inset: 0;
-          width: 100%;
-          height: 100%;
+          width: 380px;
+          height: 380px;
+          overflow: visible;
+        }
+        .radar-sweep-arm {
+          transform-origin: 190px 190px;
+          animation: radarSweepAnim 7s linear infinite;
+        }
+        @keyframes radarSweepAnim {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
         }
         .radar-pulse-node {
           animation: pulseNode 2s infinite alternate;
+          filter: drop-shadow(0 0 6px rgba(245, 166, 35, 0.9));
+        }
+        .radar-halo-node {
+          animation: pulseHalo 2s infinite ease-out;
+          transform-origin: center;
         }
         @keyframes pulseNode {
-          0% { transform: scale(0.9); opacity: 0.8; }
+          0% { transform: scale(0.9); opacity: 0.85; }
           100% { transform: scale(1.3); opacity: 1; }
         }
-        .radar-tag-pill {
+        @keyframes pulseHalo {
+          0% { opacity: 0.8; stroke-width: 1.5; }
+          100% { opacity: 0.1; stroke-width: 0.5; }
+        }
+        .radar-series-nav {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.5rem;
+          margin-top: -10px;
           position: relative;
-          z-index: 2;
-          background: rgba(9, 10, 15, 0.85);
+          z-index: 5;
+          flex-wrap: wrap;
+        }
+        .radar-nav-pill {
+          background: rgba(14, 16, 23, 0.85);
           backdrop-filter: blur(8px);
-          border: 1px solid var(--color-border-highlight);
-          padding: 0.4rem 0.9rem;
-          border-radius: var(--radius-full);
-          font-size: 0.72rem;
-          color: var(--color-amber);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          padding: 0.35rem 0.75rem;
+          border-radius: 9999px;
+          font-size: 0.65rem;
+          color: #94a3b8;
           display: inline-flex;
           align-items: center;
-          margin-top: 160px;
+          gap: 0.35rem;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          letter-spacing: 0.06em;
         }
-        .radar-subtext {
+        .radar-nav-pill:hover {
+          color: #ffffff;
+          border-color: rgba(255, 255, 255, 0.2);
+        }
+        .radar-nav-pill.active {
+          color: #ffffff;
+          background: rgba(245, 166, 35, 0.15);
+          border-color: var(--color-amber);
+        }
+        .pill-dot {
+          width: 5px;
+          height: 5px;
+          border-radius: 50%;
+          background: #64748b;
+          display: inline-block;
+        }
+        .radar-nav-pill.active .pill-dot {
+          background: var(--color-amber);
+          box-shadow: 0 0 6px var(--color-amber);
+        }
+        .radar-detail-block {
+          margin-top: 0.85rem;
+          text-align: center;
+          max-width: 320px;
           position: relative;
-          z-index: 2;
+          z-index: 5;
+        }
+        .radar-detail-header {
           font-size: 0.75rem;
-          color: var(--color-text-muted);
-          max-width: 220px;
-          margin-top: 0.4rem;
+          font-weight: 700;
+          color: var(--color-amber);
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+        }
+        .radar-detail-text {
+          font-size: 0.8rem;
+          color: #94a3b8;
+          line-height: 1.5;
+          margin-top: 0.35rem;
+        }
+        .radar-detail-link {
+          margin: 0.6rem auto 0;
+          background: transparent;
+          border: none;
+          color: #ffffff;
+          font-size: 0.72rem;
+          font-weight: 600;
+          letter-spacing: 0.08em;
+          cursor: pointer;
+          transition: color 0.2s ease;
+        }
+        .radar-detail-link:hover {
+          color: var(--color-amber);
         }
 
         /* ---- 3-STEP STRIP ---- */
@@ -978,45 +1173,73 @@ export default function Home({ selectedAsset, setSelectedAsset, currentUser, onO
           align-items: stretch;
         }
         .pricing-card {
-          background: #11141f;
+          background: #0e1017;
           border: 1px solid rgba(255, 255, 255, 0.08);
-          border-radius: 16px;
+          border-radius: 18px;
           overflow: hidden;
           display: flex;
           flex-direction: column;
           position: relative;
-          transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+          transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
         }
         .pricing-card:hover {
-          border-color: rgba(255, 255, 255, 0.2);
-          transform: translateY(-4px);
+          transform: translateY(-5px);
+        }
+        .pricing-card-bronze {
+          border-color: rgba(205, 127, 50, 0.25);
+        }
+        .pricing-card-bronze:hover {
+          border-color: rgba(205, 127, 50, 0.5);
+          box-shadow: 0 0 30px rgba(205, 127, 50, 0.16);
         }
         .pricing-card-popular {
           border-color: var(--color-amber);
-          box-shadow: 0 0 35px rgba(245, 166, 35, 0.16);
-          background: #131724;
+          box-shadow: 0 0 35px rgba(245, 166, 35, 0.22);
+          background: #11141e;
+        }
+        .pricing-card-popular:hover {
+          border-color: #ffb800;
+          box-shadow: 0 0 45px rgba(245, 166, 35, 0.35);
+        }
+        .pricing-card-premium {
+          border-color: rgba(255, 215, 0, 0.25);
+        }
+        .pricing-card-premium:hover {
+          border-color: rgba(255, 215, 0, 0.5);
+          box-shadow: 0 0 35px rgba(255, 215, 0, 0.18);
         }
         .pricing-card-header {
           padding: 2.25rem 2rem 1.5rem;
-          text-align: center;
+          text-align: left;
           border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-          background: rgba(255, 255, 255, 0.02);
+          background: rgba(255, 255, 255, 0.015);
           display: flex;
           flex-direction: column;
-          align-items: center;
+          align-items: flex-start;
           position: relative;
         }
-        .popular-badge-wrap {
-          margin-bottom: 0.6rem;
+        .pricing-card-meta-row {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          width: 100%;
+          margin-bottom: 0.75rem;
+        }
+        .pricing-category-tag {
+          font-size: 0.65rem;
+          color: var(--color-amber);
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          font-weight: 700;
         }
         .popular-badge {
           background: var(--color-amber);
           color: #090a0f;
-          font-size: 0.65rem;
+          font-size: 0.62rem;
           font-weight: 800;
           padding: 0.2rem 0.65rem;
           border-radius: 9999px;
-          letter-spacing: 0.06em;
+          letter-spacing: 0.08em;
           display: inline-block;
         }
         .pricing-card-name {
@@ -1027,12 +1250,12 @@ export default function Home({ selectedAsset, setSelectedAsset, currentUser, onO
           letter-spacing: -0.01em;
         }
         .pricing-card-service {
-          font-size: 0.78rem;
-          letter-spacing: 0.1em;
-          color: var(--color-amber);
+          font-size: 0.75rem;
+          letter-spacing: 0.08em;
+          color: #64748b;
           text-transform: uppercase;
-          margin-top: 0.4rem;
-          font-weight: 600;
+          margin-top: 0.25rem;
+          font-weight: 500;
         }
         .pricing-roi-block {
           padding: 2.25rem 2rem 0;
@@ -1044,6 +1267,13 @@ export default function Home({ selectedAsset, setSelectedAsset, currentUser, onO
           color: var(--color-amber);
           line-height: 1;
           letter-spacing: -0.02em;
+        }
+        .pricing-cycle-tag {
+          font-size: 0.68rem;
+          color: #64748b;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          margin-top: 0.5rem;
         }
         .pricing-divider {
           height: 1px;
@@ -1062,7 +1292,7 @@ export default function Home({ selectedAsset, setSelectedAsset, currentUser, onO
           display: flex;
           align-items: center;
           gap: 0.85rem;
-          font-size: 0.9rem;
+          font-size: 0.88rem;
           color: #cbd5e1;
           line-height: 1.4;
         }
@@ -1086,11 +1316,34 @@ export default function Home({ selectedAsset, setSelectedAsset, currentUser, onO
           padding: 0.85rem 1.5rem;
           border-radius: 9999px;
           font-weight: 700;
-          font-size: 0.95rem;
+          font-size: 0.92rem;
           letter-spacing: 0.01em;
           display: flex;
           align-items: center;
           justify-content: center;
+          cursor: pointer;
+        }
+        .btn-white-pill {
+          background: #ffffff;
+          color: #090a0f;
+          border: 1px solid #ffffff;
+          transition: all 0.2s ease;
+        }
+        .btn-white-pill:hover {
+          box-shadow: 0 0 20px rgba(255, 255, 255, 0.35);
+          transform: translateY(-2px);
+          background: #f1f5f9;
+        }
+        .btn-gold {
+          background: #f5a623;
+          color: #090a0f;
+          border: 1px solid #f5a623;
+          transition: all 0.2s ease;
+        }
+        .btn-gold:hover {
+          box-shadow: 0 0 25px rgba(245, 166, 35, 0.5);
+          transform: translateY(-2px);
+          background: #ffb800;
         }
         .pricing-note {
           text-align: center;
